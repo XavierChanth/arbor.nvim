@@ -1,4 +1,55 @@
----@class arbor.actions.preset.worktree: arbor.actions.spec
+---@class arbor.actions.worktree: arbor.actions_spec
 local M = {}
+-- TODO: use this code for actions/new_branch action
+-- now we know we need to make a new branch for sure
+-- so get the source/base branch
+-- local branch_from
+-- if branches and (opts.branch_from == "main" or opts.branch_from == "current") then
+-- 	local head
+-- 	local main
+-- 	for _, branch in ipairs(branches) do
+-- 		if branch.head then
+-- 			head = true
+-- 			branch_from = branch
+-- 		end
+-- 		if not main and branch.main_branch then
+-- 			main = true
+-- 			branch_from = branch
+-- 		end
+-- 		-- head and main_branches should be sorted to the top
+-- 		-- so we can break early here
+-- 		if not branch.head and not branch.main_branch then
+-- 			break
+-- 		end
+-- 	end
+-- 	if (not main and opts.branch_from == "main") or (not head and opts.branch_from == "current") then
+-- 		require("arbor.lib.notify").warn(
+-- 			"Could not find " .. opts.branch_from .. " branch, falling back to prompt"
+-- 		)
+-- 		opts.branch_from = "prompt"
+-- 	end
+-- end
+--
+-- if opts.branch_from == "prompt" then
+-- 	local input = require("arbor.lib.input").resolve()
+--
+-- 	local sender, receiver = require("plenary.async.control").channel.mpsc()
+-- 	local yield_input = function(user_input)
+-- 		sender:send(user_input or "")
+-- 	end
+--
+-- 	input({
+-- 		prompt = "Source branch",
+-- 	}, yield_input)
+--
+-- 	branch_from = receiver.recv()
+-- 	if string.len(branch_from) == 0 then
+-- 		return
+-- 	end
+-- end
+--
+-- if item.type == "remote-branch" then
+-- 	-- TODO: pull branch from remote
+-- end
 
 return M

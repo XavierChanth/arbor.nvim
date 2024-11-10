@@ -16,12 +16,12 @@ function M.is_inside(path)
 	return exit_code == 0 and res[1] == "true"
 end
 
----@alias arbor.git.worktree.add table
-
 ---@param opts? arbor.git.worktree.add
 ---@return nil
 function M.add(opts)
 	--
 end
+
+function M.switch(opts) end
 
 return M

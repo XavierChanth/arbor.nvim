@@ -1,51 +1,18 @@
----@module "arbor.config"
-
 ---@class arbor.config_module : arbor.config
+---@field set function(opts: arbor.config|nil): arbor.config
 local M = {}
+local default_config = require("arbor.config.default")
 
 ---@type arbor.config
-local default_config = {
-	picker = "vim",
-	input = "vim",
-	git = {
-		library = "arbor",
-		binary = "git",
-		main_branch = { "main", "master", "trunk" },
-	},
-	worktree = {
-		normal = {
-			style = "relative_common",
-			path = "../",
-		},
-		bare = {
-			style = "relative_common",
-			path = ".",
-		},
-	},
-	-- Actions are additional commands that appear in the picker
-	-- If you select an action, then it will run the associated function instead
-	-- of operating on the branch
-	-- This can clash with the name of remotes for your repo, thus you can change
-	-- prefix to make it unique
-	actions = {
-		preset = nil,
-		prefix = "action",
-		add = {},
-		move = {},
-		switch = {},
-		delete = {},
-	},
-	hooks = {},
-}
+local config = vim.tbl_extend("force", default_config, {})
 
-local config = default_config
-
----@param opts? arbor.config
+---@param opts arbor.config_opts
 ---@return arbor.config
 function M.set(opts)
 	opts = opts or {}
 
 	opts.actions = opts.actions or {}
+
 	if opts.actions.preset then
 		if type(opts.actions.preset) == "string" then
 			opts.actions.preset = {
@@ -63,13 +30,16 @@ function M.set(opts)
 		end
 	end
 
-	config = vim.tbl_deep_extend("force", config, opts)
-	return config
+	return vim.tbl_deep_extend("force", config, opts)
 end
 
----@class arbor.config_module : arbor.config
 setmetatable(M, {
 	__index = function(_, k)
+		--- resolve the git binary as a string
+		if k == "git" and config.git and type(config.git.binary) == "function" then
+			config.git.binary = config.git.binary()
+		end
+
 		return config[k]
 	end,
 })

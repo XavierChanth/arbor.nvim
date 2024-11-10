@@ -1,47 +1,52 @@
 ---@meta
 
----@class arbor.config_module : arbor.config
----@field set function(opts? arbor.config): arbor.config
+---Get types
 
 ---@class arbor.config
----@field picker? arbor.picker.providers
----@field input? arbor.input.providers
----@field git? arbor.config.git
----@field worktree? arbor.config.worktree_spec
----@field actions? arbor.config.actions
----@field hooks? arbor.config.hooks
+---@field select arbor.select.provider
+---@field input arbor.input.provider
+---@field notify arbor.config.notify
+---@field settings arbor.config.settings
+---@field git arbor.config.git
+---@field worktree arbor.config.worktree
+---@field actions arbor.actions.config
+---@field hooks arbor.hooks
+---@field events arbor.event[]
+
+---@class arbor.config.notify
+---@field enabled boolean
+---@field level? integer
+---@field opts? table
+
+---@class arbor.config.settings
+---@field global arbor.core_opts
+---@field add arbor.core.add_opts
+---@field delete arbor.core.delete_opts
+---@field switch arbor.core.switch_opts
+---@field move arbor.core.move_opts
 
 ---@class arbor.config.git
----@field library? arbor.config.git.library
 ---@field binary? string
 ---@field main_branch? string | string[]
-
----@alias arbor.config.git.library
----| "arbor" Use built-in arbor
-
----@class arbor.config.worktree_spec
----@field normal arbor.config.worktree
----@field bare arbor.config.worktree
+---TODO add git fetch before worktree arg
 
 ---@class arbor.config.worktree
----@field style? arbor.config.worktree.style
----@field path? string
+---@field normal arbor.config.worktree_spec
+---@field bare arbor.config.worktree_spec
 
----@alias arbor.config.worktree.style
----| "relative_common"
----| "relative_cwd"
----| "absolute"
+---@class arbor.config.worktree_spec
+---@field style? arbor.worktree.style
+---@field path? arbor.config.worktree.path
 
----@class arbor.config.actions : arbor.actions_spec
----@field preset? arbor.actions.preset | arbor.actions.preset[]
----@field prefix? string
+---Set types
+---@class arbor.config_opts: arbor.config
+---@field picker? arbor.select.provider
+---@field input? arbor.input.provider
+---@field git? arbor.config.git_opts
+---@field worktree? arbor.config.worktree
+---@field actions? arbor.actions.config
+---@field hooks? arbor.hooks
 
----@class arbor.config.hooks
----@field pre_add? arbor.hooks.pre.add
----@field post_add? arbor.hooks.post.add
----@field pre_delete? arbor.hooks.pre.delete
----@field post_delete? arbor.hooks.post.delete
----@field pre_switch? arbor.hooks.pre.switch
----@field post_switch? arbor.hooks.post.switch
----@field pre_move? arbor.hooks.pre.move
----@field post_move? arbor.hooks.post.move
+---@class arbor.config.git_opts
+---@field binary? string| function(): string
+---@field main_branch? string | string[]

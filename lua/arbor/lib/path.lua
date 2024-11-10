@@ -1,5 +1,5 @@
+---@class arbor.git.path
 local M = {}
-
 -- Lazy.nvim and LazyVim don't have a proper copyright in the licenses
 -- so I've provided permalinks to where the code is from
 
@@ -26,6 +26,11 @@ function M.realpath(path)
 	end
 	path = vim.uv.fs_realpath(path) or path
 	return M.norm(path)
+end
+
+function M.cwd()
+	-- supposedly vim.uv.cwd can return nil, so fallback to vim std fn
+	return vim.uv.cwd() or vim.fn.getcwd()
 end
 
 return M

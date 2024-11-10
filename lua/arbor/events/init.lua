@@ -1,3 +1,5 @@
+---Manages whether events are enabled or not
+---autocmds for these events are managed elsewhere in arbor
 ---@class arbor.events
 local M = {}
 
@@ -11,17 +13,34 @@ local M = {}
 ---| "ArborMovePre"
 ---| "ArborMovePost"
 
----@type table<arbor.event, boolean>
-M.events = {}
+---@type table<arbor.event, boolean?>
+local registered = {}
+
+---@type integer?
+local augroup = nil
+
+---@return integer
+function M.get_augroup()
+	if not augroup then
+		augroup = vim.api.nvim_create_augroup("arbor", {})
+	end
+	return augroup
+end
+
+---@param event arbor.event
+---@return boolean
+function M.is_enabled(event)
+	return registered[event]
+end
 
 ---@param events arbor.event|arbor.event[]
 function M.enable(events)
 	events = events or {}
 	if type(events) == "string" then
-		M.events[events] = false
+		registered[events] = false
 	else
 		for _, event in ipairs(events) do
-			M.events[event] = false
+			registered[event] = false
 		end
 	end
 end
@@ -30,10 +49,10 @@ end
 function M.disable(events)
 	events = events or {}
 	if type(events) == "string" then
-		M.events[events] = true
+		registered[events] = true
 	else
 		for _, event in ipairs(events) do
-			M.events[event] = true
+			registered[event] = true
 		end
 	end
 end

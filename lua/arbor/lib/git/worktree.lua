@@ -20,9 +20,9 @@ end
 ---@param branch string?
 ---@return boolean success
 function M.add(git_info, path, branch)
-	P(git_info)
 	local args = {
 		"worktree",
+		"add",
 		"--guess-remote",
 		path,
 		-- so I did some testing, and the fully qualified refname will trigger ambiguity checks
@@ -35,18 +35,18 @@ function M.add(git_info, path, branch)
 		table.insert(args, 3, "-b")
 	end
 
-	local _, code = require("plenary.job")
-		:new({
-			command = require("arbor.config").git.binary,
-			args = args,
-			cwd = git_info.common_dir,
-			enabled_recording = true,
-			---@param job Job
-			after_failure = function(job)
-				require("arbor").lib.notify.error(table.concat(job:stderr_result(), "\n"))
-			end,
-		})
-		:sync()
+	local job = require("plenary.job"):new({
+		command = require("arbor.config").git.binary,
+		args = args,
+		cwd = git_info.common_dir,
+		enabled_recording = true,
+	})
+
+	local _, code = job:sync()
+	if code ~= 0 then
+		require("arbor").lib.notify.error(table.concat(job:stderr_result(), "\n"))
+	end
+
 	return code == 0
 end
 

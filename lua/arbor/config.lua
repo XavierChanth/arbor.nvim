@@ -20,7 +20,7 @@ local default_config = {
 			path_style = "smart",
 			show_remote_branches = true,
 			switch_if_wt_exists = true,
-			branch_pattern = "",
+			branch_pattern = nil,
 		},
 		delete = {},
 		switch = {},

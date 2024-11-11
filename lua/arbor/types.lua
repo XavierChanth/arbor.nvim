@@ -218,9 +218,9 @@
 ---@field hooks arbor.hook_pair
 ---@field preserve_default_hooks boolean
 
----@class arbor.opts.add.internal : arbor.opts
+---@class arbor.opts.add.internal : arbor.opts.add
 ---@field show_remote_branches boolean
----@field branch_pattern string
+---@field branch_pattern? string
 ---@field path_style arbor.opts.add.path_style
 ---@field switch_if_wt_exists boolean
 

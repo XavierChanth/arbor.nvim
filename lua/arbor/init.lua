@@ -18,7 +18,7 @@ local M = {}
 local modules = {
 	-- core utilities
 	config = "arbor.config",
-	git = "arbor.git",
+	lib = "arbor.lib",
 
 	-- core features
 	add = "arbor.core.add",

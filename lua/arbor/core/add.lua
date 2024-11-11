@@ -11,13 +11,15 @@ local config = require("arbor.config")
 local lib = require("arbor.lib")
 local common = require("arbor.core.common")
 
----@param opts arbor.opts.add
+---@param opts? arbor.opts.add
 function M.add(opts)
 	local git_info = lib.git.info.resolve()
 	if not git_info or not git_info.resolved_base then
 		lib.notify.error("Failed to resolve repo base")
 		return
 	end
+
+	opts = vim.tbl_deep_extend("force", config.settings.add, opts or {})
 
 	local actions = config.actions.add or {}
 	---@type arbor.item[]
@@ -67,27 +69,33 @@ function M.item_selected(opts, git_info, local_branches)
 			git_info.branch_info = item.branch_info
 		end
 
+		-- FIXME: this if is being skipped
 		if item.branch_info.worktreepath and string.len(item.branch_info.worktreepath) > 0 then
 			if opts.switch_if_wt_exists then
 				-- TODO: switch instead of add
 				vim.print("TODO: auto switch")
-				return
 			end
+			return
 		end
 
 		if opts.path_style == "smart" then
-			local remotes = lib.git.query.list_remotes(git_info.common_dir) or {}
-			local found = false
-			for _, remote in ipairs(remotes) do
-				if git_info.branch_info.display_name:find("^" .. remote) then
-					git_info.new_path = git_info.branch_info.display_name:sub(#remote + 1)
-					found = true
-					break
-				end
-			end
-			if not found then
-				opts.path_style = "same"
-			end
+			git_info.new_path = vim.fs.basename(git_info.branch_info.display_name)
+			-- TODO: fix this version of smart
+			-- local remotes = lib.git.query.list_remotes(git_info.common_dir) or {}
+			-- local found = false
+			-- for _, remote in ipairs(remotes) do
+			-- 	if
+			-- 		#remote ~= #git_info.branch_info.display_name
+			-- 		and git_info.branch_info.display_name:find("^" .. remote)
+			-- 	then
+			-- 		git_info.new_path = git_info.branch_info.display_name:sub(#remote + 1)
+			-- 		found = true
+			-- 		break
+			-- 	end
+			-- end
+			-- if not found then
+			-- 	opts.path_style = "same"
+			-- end
 		end
 
 		if opts.path_style == "same" then
@@ -115,6 +123,12 @@ function M.create_worktree(git_info, is_sync)
 			-- user canceled the input
 			return
 		end
+
+		if not git_info.new_path then
+			lib.notify.error("Worktree path is nil")
+			return
+		end
+		git_info.new_path = git_info.resolved_base .. "/" .. git_info.new_path
 
 		-- TODO: when do we prompt for a branch_name?
 

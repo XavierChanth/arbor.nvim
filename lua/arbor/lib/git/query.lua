@@ -71,6 +71,7 @@ function M.get_branches(opts)
 		end
 		entry.display_name = string.sub(entry.refname, string.len(prefix) + 1)
 
+		-- if vim.startswith(entry.display_name, "refs/"
 		-- priority sorting
 		if entry.head then
 			table.insert(priority_branches, 1, entry)

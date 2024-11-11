@@ -69,7 +69,7 @@ function M.get_branches(opts)
 		else
 			return
 		end
-		entry.displayname = string.sub(entry.refname, string.len(prefix) + 1)
+		entry.display_name = string.sub(entry.refname, string.len(prefix) + 1)
 
 		-- priority sorting
 		if entry.head then
@@ -78,7 +78,7 @@ function M.get_branches(opts)
 		end
 
 		for _, branch in ipairs(main_branches) do
-			if branch == entry.displayname then
+			if branch == entry.display_name then
 				entry.main_branch = true
 				priority_branches[#priority_branches] = entry
 				return

@@ -11,9 +11,4 @@ setmetatable(M, {
 	end,
 })
 
----info
----@class arbor.git
-
--- TODO: __index
-
 return M

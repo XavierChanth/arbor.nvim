@@ -4,6 +4,8 @@ local M = {}
 -- so I've provided permalinks to where the code is from
 
 -- https://github.com/folke/lazy.nvim/blob/b1134ab82ee4279e31f7ddf7e34b2a99eb9b7bc9/lua/lazy/core/util.lua#L74
+---@param path string
+---@return string | nil
 function M.norm(path)
 	if path:sub(1, 1) == "~" then
 		local home = vim.uv.os_homedir()
@@ -20,6 +22,8 @@ function M.norm(path)
 end
 
 -- https://github.com/LazyVim/LazyVim/blob/4876d1137d374af6f39661e402926220517ae4ab/lua/lazyvim/util/root.lua#L77
+---@param path string
+---@return string | nil
 function M.realpath(path)
 	if path == "" or path == nil then
 		return nil
@@ -28,6 +32,7 @@ function M.realpath(path)
 	return M.norm(path)
 end
 
+---@return string
 function M.cwd()
 	-- supposedly vim.uv.cwd can return nil, so fallback to vim std fn
 	return vim.uv.cwd() or vim.fn.getcwd()

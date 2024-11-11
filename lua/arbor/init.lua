@@ -9,18 +9,23 @@
 
 -- extensions
 ---@class arbor
----@field events arbor.events
 ---@field actions arbor.actions
+---@field events arbor.events
 
 ---@class arbor
 local M = {}
 
 local modules = {
-	actions = "arbor.actions",
+	-- core utilities
 	config = "arbor.config",
-	events = "arbor.event",
 	git = "arbor.git",
+
+	-- core features
 	add = "arbor.core.add",
+
+	-- extensions
+	actions = "arbor.actions",
+	events = "arbor.events",
 }
 
 setmetatable(M, {

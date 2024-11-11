@@ -1,21 +1,11 @@
 ---@meta
-
 ---# Arbor type definitions
 
 ---@class arbor
 
 ---##Config
----
----> All the types in config have implicit
-
----Developer note:
----Add new config type to arbor.config.internal first.
----Lua ls will give you a nice warning to set an optional type
----for the public facing version type [[arbor.config]]
----@type arbor.config
-local _ = {}
-
----@class arbor.config : arbor.config.internal
+---> Implicitly type to supress warnings for the user
+---@class arbor.config
 ---@field select? arbor.select.provider
 ---@field input? arbor.input.provider
 ---@field notify? arbor.config.notify
@@ -24,7 +14,7 @@ local _ = {}
 ---@field worktree? arbor.config.worktree
 ---@field actions? arbor.config.actions
 ---@field hooks? arbor.hooks
----@field autocmds? arbor.autocmd[]
+---@field events? arbor.event[]
 
 ---@class arbor.config.notify
 ---@field enabled? boolean
@@ -38,14 +28,20 @@ local _ = {}
 ---@field switch? arbor.opts.switch
 ---@field move? arbor.opts.move
 
----@class arbor.config.actions : arbor.actions
----@field preset? arbor.actions.preset | arbor.actions.preset[]
+---@class arbor.config.actions
 ---@field prefix? string
+---@field add? table<string, arbor.action>
+---@field delete? table<string, arbor.action>
+---@field switch? table<string, arbor.action>
+---@field move? table<string, arbor.action>
 
 ---@class arbor.config.git
----@field binary? string
+---@field binary? arbor.config.git.binary
 ---@field main_branch? string | string[]
----TODO add git fetch before worktree arg
+
+---@alias arbor.config.git.binary
+---| string
+---| function(): string
 
 ---@class arbor.config.worktree
 ---@field normal? arbor.config.worktree_spec
@@ -66,28 +62,27 @@ local _ = {}
 
 ---@alias arbor.config.worktree.path
 ---| string
----| function(spec: arbor.git.path_base_spec): string
+---| function(spec: arbor.git.info): string
 
 ---## Core features
 
 ---@class arbor.opts
----@field select? arbor.opts.select opts table for vim.ui.select
----@field telescope? table opts table for telescope.nvim
----@field fzf? table opts table for fzf-lua
 ---@field hooks? arbor.hook_pair
----@field preserve_default_hooks? boolean default hooks defined in config always run first
+---@field preserve_default_hooks? boolean
 
 ---@class arbor.opts.select
 ---@field prompt? string
----@field format_item? function(item: arbor.core_item): string
+---@field format_item? arbor.opts.select.format_item
 ---@field kind? string
 
+---@alias arbor.opts.select.format_item
+---| function(item: arbor.item): string
+
 ---@class arbor.opts.add : arbor.opts
----@field show_remote_branches? boolean
 ---@field branch_pattern? string
 ---@field path_style? arbor.opts.add.path_style
+---@field show_remote_branches? boolean
 ---@field switch_if_wt_exists? boolean
----@field cd_after? boolean
 
 ---@class arbor.opts.delete :arbor.opts
 
@@ -157,6 +152,11 @@ local _ = {}
 
 ---## Extensions
 
+---###Actions
+
+---@alias arbor.action
+---| function(info: arbor.git.info): arbor.git.info|nil
+
 ---### Hooks
 
 ---@class arbor.hook_pair
@@ -173,31 +173,12 @@ local _ = {}
 ---@field pre_move? arbor.hooks.pre
 ---@field post_move? arbor.hooks.post
 
----@alias arbor.hooks.pre function(spec: arbor.hooks.pre_spec): arbor.hooks.pre_spec
----@alias arbor.hooks.post function(spec: arbor.hooks.post_spec): arbor.hooks.post_spec
-
----###Actions
-
----@class arbor.actions
----@field add? table<string, arbor.action>
----@field delete? table<string, arbor.action>
----@field switch? table<string, arbor.action>
----@field move? table<string, arbor.action>
-
----@class arbor.action.info
----@field branch string
----@field path string
----@field git_dir string
-
----@alias arbor.action
----| function(info: arbor.git.hooks_base_spec): nil
-
----@alias arbor.actions.preset
----| "git"
+---@alias arbor.hooks.pre arbor.action
+---@alias arbor.hooks.post arbor.action
 
 ---###Autocommands
----
----@alias arbor.autocmd
+
+---@alias arbor.event
 ---| "ArborAddPre"
 ---| "ArborAddPost"
 ---| "ArborDeletePre"
@@ -208,7 +189,8 @@ local _ = {}
 ---| "ArborMovePost"
 
 ---## Internal Config
----> Strongly typed to suppress warnings
+---> Strongly typed to suppress warnings internally
+
 ---@class arbor.config.internal
 ---@field select arbor.select.provider
 ---@field input arbor.input.provider
@@ -218,7 +200,7 @@ local _ = {}
 ---@field worktree arbor.config.worktree.internal
 ---@field actions arbor.config.actions
 ---@field hooks arbor.hooks
----@field autocmds arbor.autocmd[]
+---@field events arbor.event[]
 
 ---@class arbor.config.notify.internal
 ---@field enabled boolean
@@ -226,14 +208,34 @@ local _ = {}
 ---@field opts table
 
 ---@class arbor.config.settings.internal
----@field global arbor.opts
----@field add arbor.opts.add
+---@field global arbor.opts.internal
+---@field add arbor.opts.add.internal
 ---@field delete arbor.opts.delete
 ---@field switch arbor.opts.switch
 ---@field move arbor.opts.move
 
+---@class arbor.opts.internal : arbor.opts
+---@field hooks arbor.hook_pair
+---@field preserve_default_hooks boolean
+
+---@class arbor.opts.add.internal : arbor.opts
+---@field show_remote_branches boolean
+---@field branch_pattern string
+---@field path_style arbor.opts.add.path_style
+---@field switch_if_wt_exists boolean
+
+---@class arbor.opts.select.internal
+---@field prompt string
+---@field format_item? arbor.opts.select.format_item
+---@field kind? string
+
+---@class arbor.opts.delete.internal :arbor.opts
+
+---@class arbor.opts.switch.internal : arbor.opts
+
+---@class arbor.opts.move : arbor.opts
+
 ---@class arbor.config.actions.internal : arbor.config.actions
----@field preset arbor.actions.preset | arbor.actions.preset[]
 ---@field prefix string
 
 ---@class arbor.config.git.internal

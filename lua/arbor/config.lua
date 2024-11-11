@@ -12,11 +12,15 @@ local default_config = {
 		opts = nil,
 	},
 	settings = {
-		global = {},
+		global = {
+			hooks = {},
+			preserve_default_hooks = false,
+		},
 		add = {
-			branch_from = "prompt",
-			show_remote_branches = false,
+			path_style = "smart",
+			show_remote_branches = true,
 			switch_if_wt_exists = true,
+			branch_pattern = "",
 		},
 		delete = {},
 		switch = {},
@@ -37,49 +41,23 @@ local default_config = {
 		},
 	},
 	actions = {
-		preset = nil,
 		prefix = "action",
-		add = {},
-		move = {},
-		switch = {},
-		delete = {},
 	},
 	hooks = {},
-	autocmds = {},
+	events = {},
 }
 
 ---@class arbor.config_module : arbor.config.internal
----@field set function(opts: arbor.config|nil): arbor.config
 local M = {}
 
 ---@type arbor.config.internal
 local config = vim.tbl_extend("force", default_config, {})
 
----@param opts arbor.config
+---@param opts? arbor.config
 ---@return arbor.config.internal
 function M.set(opts)
-	opts = opts or {}
-
-	opts.actions = opts.actions or {}
-
-	if opts.actions.preset then
-		if type(opts.actions.preset) == "string" then
-			opts.actions.preset = {
-				opts.actions.preset --[[@as arbor.actions.preset]],
-			}
-		end
-		for _, preset in
-			ipairs(opts.actions.preset--[[@as arbor.actions.preset[] ]])
-		do
-			opts.actions = vim.tbl_deep_extend(
-				"keep",
-				opts.actions,
-				require("arbor.extensions.actions")[opts.actions.preset[preset]] or {}
-			)
-		end
-	end
-
-	return vim.tbl_deep_extend("force", config, opts) --[[@as arbor.config.internal]]
+	config = vim.tbl_deep_extend("force", config, opts or {})
+	return config
 end
 
 setmetatable(M, {

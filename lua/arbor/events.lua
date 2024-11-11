@@ -3,16 +3,6 @@
 ---@class arbor.events
 local M = {}
 
----@alias arbor.event
----| "ArborAddPre"
----| "ArborAddPost"
----| "ArborDeletePre"
----| "ArborDeletePost"
----| "ArborSwitchPre"
----| "ArborSwitchPost"
----| "ArborMovePre"
----| "ArborMovePost"
-
 ---@type table<arbor.event, boolean?>
 local registered = {}
 

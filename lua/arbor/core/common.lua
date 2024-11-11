@@ -29,23 +29,23 @@ function M.get_events(key, autocmd_prefix, opts)
 
 	if opts.preserve_default_hooks then
 		res = {
-			hookpre = function(spec)
+			hookpre = function(git_info)
 				if config.hooks[hookpre] and config.hooks[hookpre] then
-					spec = config.hooks[hookpre](spec)
+					git_info = config.hooks[hookpre](git_info)
 				end
 				if opts.hooks.pre then
-					spec = opts.hooks.pre(spec)
+					git_info = opts.hooks.pre(git_info)
 				end
-				return spec
+				return git_info
 			end,
-			hookpost = function(spec)
+			hookpost = function(git_info)
 				if config.hooks[hookpost] and config.hooks[hookpost] then
-					spec = config.hooks[hookpost](spec)
+					git_info = config.hooks[hookpost](git_info)
 				end
 				if opts.hooks.post then
-					spec = opts.hooks.post(spec)
+					git_info = opts.hooks.post(git_info)
 				end
-				return spec
+				return git_info
 			end,
 		}
 	else
@@ -58,19 +58,19 @@ function M.get_events(key, autocmd_prefix, opts)
 	-- setup autocmds
 	local aupre = autocmd_prefix .. "Pre"
 	local aupost = autocmd_prefix .. "Post"
-	for _, ev in ipairs(config.autocmds) do
+	for _, ev in ipairs(config.events) do
 		if ev == aupre then
-			res["aupre"] = function(base_spec)
+			res["aupre"] = function(git_info)
 				vim.api.nvim_exec_autocmds(aupre, {
 					group = require("arbor.extensions.hooks").get_augroup(),
-					data = base_spec,
+					data = git_info,
 				})
 			end
 		elseif ev == aupost then
-			res["aupost"] = function(base_spec)
+			res["aupost"] = function(git_info)
 				vim.api.nvim_exec_autocmds(aupre, {
 					group = require("arbor.extensions.hooks").get_augroup(),
-					data = base_spec,
+					data = git_info,
 				})
 			end
 		end
@@ -80,16 +80,15 @@ function M.get_events(key, autocmd_prefix, opts)
 end
 
 ---@param actions table<string, arbor.action>
----@param prefix string prefix to strip from label
 ---@param items? arbor.item[]
 ---@return arbor.item[]
-function M.append_actions_to_items(actions, prefix, items)
+function M.append_actions_to_items(actions, items)
 	items = items or {}
 	for id, callback in pairs(actions) do
 		items[#items + 1] = {
 			id = id,
 			type = "action",
-			label = id:sub(#prefix + 1),
+			label = id,
 			action_callback = callback,
 		}
 	end

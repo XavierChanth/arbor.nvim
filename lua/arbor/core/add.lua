@@ -13,17 +13,16 @@ local common = require("arbor.core.common")
 
 ---@param opts arbor.opts.add
 function M.add(opts)
-	local git_info = require("arbor.lib.git.base_spec").resolve()
+	local git_info = lib.git.info.resolve()
 	if not git_info or not git_info.resolved_base then
 		lib.notify.error("Failed to resolve repo base")
 		return
 	end
 
-	---@type arbor.item[]
 	local actions = config.actions.add or {}
-	local items = common.append_actions_to_items(actions, config.actions.prefix)
+	---@type arbor.item[]
+	local items = common.append_actions_to_items(actions)
 
-	-- append actions
 	local include_remote_branches = opts.show_remote_branches--[[@as boolean]]
 	if opts.show_remote_branches == nil then
 		include_remote_branches = config.settings.add.show_remote_branches
@@ -34,6 +33,14 @@ function M.add(opts)
 		include_remote_branches = include_remote_branches,
 		pattern = opts.branch_pattern,
 	})
+
+	for _, branch in ipairs(local_branches or {}) do
+		branches[#branches + 1] = branch
+	end
+
+	for _, branch in ipairs(remote_branches or {}) do
+		branches[#branches + 1] = branch
+	end
 
 	items = common.add_branches_to_items(branches, items)
 
@@ -57,6 +64,7 @@ function M.item_selected(opts, git_info, local_branches)
 				lib.notify.error("Failed to extract branch info from git")
 				return
 			end
+			git_info.branch_info = item.branch_info
 		end
 
 		if item.branch_info.worktreepath and string.len(item.branch_info.worktreepath) > 0 then
@@ -89,30 +97,41 @@ function M.item_selected(opts, git_info, local_branches)
 		elseif opts.path_style == "prompt" then
 			lib.input({
 				prompt = "Path for the worktree",
-			}, M.create_worktree(opts, git_info, item))
+			}, M.create_worktree(git_info))
 			return
 		end
 
 		-- nil implies that the branch_name is already stored in base_spec
 		-- (when not a callback from input)
-		M.create_worktree(opts, git_info, item, true)(nil)
+		M.create_worktree(git_info, true)(nil)
 	end
 end
 
-function M.create_worktree(opts, base_spec, item, is_sync)
-	return function(branch_name)
-		if branch_name then
-			base_spec.new_branch = branch_name
+function M.create_worktree(git_info, is_sync)
+	return function(path)
+		if path then
+			git_info.new_path = path
 		elseif not is_sync then
 			-- user canceled the input
 			return
 		end
 
+		-- TODO: when do we prompt for a branch_name?
+
 		local events = common.get_events("add", "ArborAdd")
-		P({
-			base_spec,
-			item,
-		})
+		git_info = events.hookpre(git_info)
+		if events.aupre then
+			events.aupre(git_info)
+		end
+
+		if not lib.git.worktree.add(git_info, git_info.new_path) then
+			return
+		end
+
+		git_info = events.hookpost(git_info)
+		if events.aupost then
+			events.aupost(git_info)
+		end
 	end
 end
 

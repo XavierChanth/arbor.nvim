@@ -78,6 +78,7 @@ function M.item_selected(opts, git_info, local_branches)
 			return
 		end
 
+		-- TODO: once "smart" is working, make basename it's own type
 		if opts.path_style == "smart" then
 			git_info.new_path = vim.fs.basename(git_info.branch_info.display_name)
 			-- TODO: fix this version of smart
@@ -102,12 +103,18 @@ function M.item_selected(opts, git_info, local_branches)
 			git_info.new_path = git_info.branch_info.display_name
 		elseif type(opts.path_style) == "function" then
 			git_info.new_path = opts.path_style(git_info, local_branches)
-		elseif opts.path_style == "prompt" then
+		end
+
+		-- TODO check if path already in use and prompt
+
+		if opts.path_style == "prompt" then
 			lib.input({
 				prompt = "Path for the worktree",
 			}, M.create_worktree(git_info))
 			return
 		end
+
+		-- TODO check if path already in use and return
 
 		-- nil implies that the branch_name is already stored in base_spec
 		-- (when not a callback from input)

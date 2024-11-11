@@ -22,7 +22,6 @@
 ---@field opts? table
 
 ---@class arbor.config.settings
----@field global? arbor.opts
 ---@field add? arbor.opts.add
 ---@field delete? arbor.opts.delete
 ---@field switch? arbor.opts.switch
@@ -48,7 +47,7 @@
 ---@field bare? arbor.config.worktree_spec
 
 ---@class arbor.config.worktree_spec
----@field style? arbor.worktree.style
+---@field base? arbor.worktree.base
 ---@field path? arbor.config.worktree.path
 
 ---@alias arbor.select.provider
@@ -81,8 +80,11 @@
 ---@class arbor.opts.add : arbor.opts
 ---@field branch_pattern? string
 ---@field path_style? arbor.opts.add.path_style
+---@field branch_style? arbor.opts.add.branch_style
 ---@field show_remote_branches? boolean
 ---@field switch_if_wt_exists? boolean
+---@field force_prompt? boolean
+---@field guess_remote? boolean
 
 ---@class arbor.opts.delete :arbor.opts
 
@@ -91,10 +93,16 @@
 ---@class arbor.opts.move : arbor.opts
 
 ---@alias arbor.opts.add.path_style
----| "prompt"
----| "same"
----| "smart"
+---| "prompt"       -- Prompt via vim.ui.input
+---| "same"         -- Use the short ref name (e.g. origin/<branch>)
+---| "basename"     -- Use the basename of the ref (if you have slashes in your branch name, it will only take the last part)
+---| "smart"        -- Tries to guess the remote to strip and strip it
 ---| function(spec: arbor.hooks.post_spec, local_branches?: string[]): string
+
+---@alias arbor.opts.add.branch_style
+---| "git"     -- Let git-worktree figure out the branch name (e.g. remotes/origin/<remote branch name>)
+---| "path"    -- Use resolved path as the branch name
+---| "prompt"  -- Input branch name
 
 ---@alias arbor.feature
 ---| "add"
@@ -120,19 +128,21 @@
 ---| "branch"
 
 ---@class arbor.git.info
+---@field operation_opts? arbor.opts
 ---@field branch string
 ---@field path string
 ---@field repo_type arbor.git.repo_type
 ---@field common_dir string
----@field new_path? string
 ---@field resolved_base? string
 ---@field branch_info? arbor.git.branch
+---@field new_path? string
+---@field new_branch? string
 
 ---@alias arbor.git.repo_type
 ---| "bare"
 ---| "normal"
 
----@alias arbor.worktree.style
+---@alias arbor.worktree.base
 ---| "relative_common"
 ---| "relative_cwd"
 ---| "absolute"
@@ -146,7 +156,7 @@
 ---@field display_name string
 
 ---@class arbor.git.get_branches_opts
----@field pattern? string
+---@field pattern? string | string[]
 ---@field cwd? string
 ---@field include_remote_branches boolean?
 
@@ -208,7 +218,6 @@
 ---@field opts table
 
 ---@class arbor.config.settings.internal
----@field global arbor.opts.internal
 ---@field add arbor.opts.add.internal
 ---@field delete arbor.opts.delete
 ---@field switch arbor.opts.switch
@@ -220,9 +229,12 @@
 
 ---@class arbor.opts.add.internal : arbor.opts.add
 ---@field show_remote_branches boolean
----@field branch_pattern? string
+---@field branch_pattern? string | string[]
+---@field branch_style arbor.opts.add.branch_style
 ---@field path_style arbor.opts.add.path_style
 ---@field switch_if_wt_exists boolean
+---@field force_prompt boolean
+---@field guess_remote boolean
 
 ---@class arbor.opts.select.internal
 ---@field prompt string
@@ -247,5 +259,5 @@
 ---@field bare arbor.config.worktree_spec.internal
 
 ---@class arbor.config.worktree_spec.internal
----@field style arbor.worktree.style
+---@field base arbor.worktree.base
 ---@field path arbor.config.worktree.path

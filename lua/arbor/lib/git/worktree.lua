@@ -15,24 +15,30 @@ function M.is_inside(path)
 
 	return code == 0 and res[1] == "true"
 end
+
 ---@param git_info arbor.git.info
 ---@param path string
 ---@param branch string?
+---@param guess_remote? boolean
 ---@return boolean success
-function M.add(git_info, path, branch)
+function M.add(git_info, path, branch, guess_remote)
 	local args = {
 		"worktree",
 		"add",
-		"--guess-remote",
 		path,
 		-- so I did some testing, and the fully qualified refname will trigger ambiguity checks
 		-- but, the display_name will automatically be inferred if possible, so it's less likely to fail
 		git_info.branch_info.display_name,
 	}
+
 	-- git will automatically try to guess the branch based on path so it's optional
 	if branch then
 		table.insert(args, 3, branch)
 		table.insert(args, 3, "-b")
+	end
+
+	if guess_remote then
+		table.insert(args, 3, "--guess-remote")
 	end
 
 	local job = require("plenary.job"):new({

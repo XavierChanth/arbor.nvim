@@ -124,19 +124,15 @@ function M.generate_item_format(item)
 end
 
 ---@param base_spec arbor.git.info
----@param item? arbor.item
----@param idx? integer
+---@param item arbor.item
+---@param idx integer
 ---@return boolean?
 function M.handle_if_action(base_spec, item, idx)
-	if not item or not idx then
-		return
-	end
-
 	if item.type == "action" then
 		item.action_callback(base_spec)
-		return
+		return true
 	end
-	return true
+	return false
 end
 
 return M

@@ -20,6 +20,8 @@ function M.add(opts)
 	end
 
 	opts = vim.tbl_deep_extend("force", config.settings.add, opts or {})
+	-- store the resolved opts in the git_info so the user can use it
+	-- in hooks & autocmds
 
 	local actions = config.actions.add or {}
 	---@type arbor.item[]
@@ -46,18 +48,26 @@ function M.add(opts)
 
 	items = common.add_branches_to_items(branches, items)
 
+	local callback = M.after_ref_selected(opts, git_info, local_branches or {})
+
 	lib.select(items, {
 		prompt = "Add worktree",
 		format_item = common.generate_item_format,
-	}, M.item_selected(opts, git_info, local_branches or {}))
+	}, callback)
 end -- end of add
 
 ---@param opts arbor.opts.add
 ---@param git_info arbor.git.info
 ---@param local_branches arbor.git.branch[]
-function M.item_selected(opts, git_info, local_branches)
+function M.after_ref_selected(opts, git_info, local_branches)
 	return function(item, idx)
-		if not common.handle_if_action(git_info, item, idx) then
+		git_info.operation_opts = opts
+
+		if not item or not idx then
+			return
+		end
+
+		if common.handle_if_action(git_info, item, idx) then
 			return
 		end
 
@@ -70,7 +80,7 @@ function M.item_selected(opts, git_info, local_branches)
 		end
 
 		-- FIXME: this if is being skipped
-		if item.branch_info.worktreepath and string.len(item.branch_info.worktreepath) > 0 then
+		if item.worktreepath and string.len(item.worktreepath) > 0 then
 			if opts.switch_if_wt_exists then
 				-- TODO: switch instead of add
 				vim.print("TODO: auto switch")
@@ -78,25 +88,28 @@ function M.item_selected(opts, git_info, local_branches)
 			return
 		end
 
-		-- TODO: once "smart" is working, make basename it's own type
-		if opts.path_style == "smart" then
+		if opts.force_prompt then
+			opts.path_style = "prompt"
+			opts.branch_style = "prompt"
+		end
+
+		if opts.path_style == "basename" then
 			git_info.new_path = vim.fs.basename(git_info.branch_info.display_name)
-			-- TODO: fix this version of smart
-			-- local remotes = lib.git.query.list_remotes(git_info.common_dir) or {}
-			-- local found = false
-			-- for _, remote in ipairs(remotes) do
-			-- 	if
-			-- 		#remote ~= #git_info.branch_info.display_name
-			-- 		and git_info.branch_info.display_name:find("^" .. remote)
-			-- 	then
-			-- 		git_info.new_path = git_info.branch_info.display_name:sub(#remote + 1)
-			-- 		found = true
-			-- 		break
-			-- 	end
-			-- end
-			-- if not found then
-			-- 	opts.path_style = "same"
-			-- end
+		elseif opts.path_style == "smart" then
+			local remotes = lib.git.query.list_remotes(git_info.common_dir) or {}
+			local matches = {}
+			for _, remote in ipairs(remotes) do
+				if git_info.branch_info.display_name:find("^" .. remote) then
+					matches[#matches + 1] = git_info.branch_info.display_name:sub(#remote + 2) -- strip '<remote>/'
+				end
+			end
+
+			if #matches == 1 then
+				git_info.new_path = matches[1]
+			else
+				lib.notify.info("Unable to resolve smart path name, prompting for path")
+				opts.path_style = "same"
+			end
 		end
 
 		if opts.path_style == "same" then
@@ -110,19 +123,21 @@ function M.item_selected(opts, git_info, local_branches)
 		if opts.path_style == "prompt" then
 			lib.input({
 				prompt = "Path for the worktree",
-			}, M.create_worktree(git_info))
+			}, M.after_path_selected(opts, git_info))
 			return
 		end
 
 		-- TODO check if path already in use and return
 
-		-- nil implies that the branch_name is already stored in base_spec
-		-- (when not a callback from input)
-		M.create_worktree(git_info, true)(nil)
+		M.after_path_selected(opts, git_info, true)()
 	end
 end
 
-function M.create_worktree(git_info, is_sync)
+---@param opts arbor.opts.add
+---@param git_info arbor.git.info
+---@param is_sync? boolean
+---@diagnostic disable-next-line: unused-local
+function M.after_path_selected(opts, git_info, is_sync)
 	return function(path)
 		if path then
 			git_info.new_path = path
@@ -132,12 +147,46 @@ function M.create_worktree(git_info, is_sync)
 		end
 
 		if not git_info.new_path then
-			lib.notify.error("Worktree path is nil")
+			lib.notify.error("Failed to resolve worktree path")
 			return
 		end
-		git_info.new_path = git_info.resolved_base .. "/" .. git_info.new_path
 
-		-- TODO: when do we prompt for a branch_name?
+		if opts.branch_style == "path" then
+			git_info.new_branch = git_info.new_path
+		end
+
+		-- Final path for worktree
+		git_info.new_path = lib.path.norm(git_info.resolved_base .. "/" .. git_info.new_path)
+
+		if not git_info.new_path then
+			lib.notify.error("Failed to resolve worktree path")
+			return
+		end
+
+		if opts.branch_style == "prompt" then
+			lib.input({
+				prompt = "Name for the branch",
+			}, M.after_branch_selected(opts, git_info))
+			return
+		end
+
+		M.after_branch_selected(opts, git_info, true)(nil)
+	end
+end
+
+---@param opts arbor.opts.add
+---@param git_info arbor.git.info
+---@param is_sync? boolean
+---@diagnostic disable-next-line: unused-local
+function M.after_branch_selected(opts, git_info, is_sync)
+	---@param branch string|nil
+	return function(branch)
+		if branch then
+			git_info.new_branch = branch
+		elseif not is_sync then
+			-- user canceled the input
+			return
+		end
 
 		local events = common.get_events("add", "ArborAdd")
 		git_info = events.hookpre(git_info)
@@ -145,7 +194,8 @@ function M.create_worktree(git_info, is_sync)
 			events.aupre(git_info)
 		end
 
-		if not lib.git.worktree.add(git_info, git_info.new_path) then
+		-- TODO: fix detached issues
+		if not lib.git.worktree.add(git_info, git_info.new_path, git_info.new_branch, opts.guess_remote) then
 			return
 		end
 

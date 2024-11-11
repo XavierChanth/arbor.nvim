@@ -71,7 +71,7 @@ function M.resolve()
 	local spec = base_spec_cache[cwd] or {}
 	-- validate worktree config for repo_type
 	local config = require("arbor.config").worktree[spec.repo_type] --[[@as arbor.config.worktree_spec]]
-	if not config or not config.style or not config.path then
+	if not config or not config.base or not config.path then
 		require("arbor.lib.notify").warn(
 			"Malformed arbor config: opts.worktree." .. spec.repo_type .. " contains a null value for a required field"
 		)
@@ -84,9 +84,9 @@ function M.resolve()
 		path = path(spec)
 	end
 
-	if config.style == "absolute" then
+	if config.base == "absolute" then
 		spec.resolved_base = path
-	elseif config.style == "relative_cwd" then
+	elseif config.base == "relative_cwd" then
 		spec.resolved_base = require("arbor.lib.path").realpath(spec.common_dir .. "/" .. path)
 	else
 		spec.resolved_base = require("arbor.lib.path").realpath(cwd .. "/" .. path)
@@ -111,7 +111,7 @@ end
 function M.common_dir_job(path)
 	return require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
-		args = { "rev-parse", "--git-common-dir" },
+		args = { "rev-parse", "--path-format=absolute", "--git-common-dir" },
 		cwd = path,
 		enabled_recording = true,
 	})

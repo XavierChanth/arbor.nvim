@@ -19,8 +19,19 @@ function M.get_branches(opts)
 		format,
 		"--sort",
 		"-authordate",
-		opts.pattern,
 	}
+
+	if type(opts.pattern) == "string" then
+		opts.pattern = {
+			opts.pattern --[[@as string ]],
+		}
+	end
+
+	if opts.pattern then
+		for _, p in opts.pattern do
+			git_args[#git_args + 1] = p
+		end
+	end
 
 	local job = require("plenary.job"):new({
 		command = require("arbor.config").git.binary,

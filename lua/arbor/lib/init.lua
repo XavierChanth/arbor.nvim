@@ -1,8 +1,15 @@
----@class arbor.git
+---@class arbor.lib
+---@field git arbor.git
+---@field input arbor.input
+---@field notify arbor.notify
+---@field path arbor.path
+---@field select arbor.select
 local M = {}
 
--- User facing git commands
-
-function M.fetch() end
+setmetatable(M, {
+	__index = function(_, k)
+		return require("arbor.lib." .. k)
+	end,
+})
 
 return M

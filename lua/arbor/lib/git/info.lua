@@ -1,10 +1,7 @@
--- This class is responsible for resolving the repository base
--- based on local git repo information and arbor config
-
----@class arbor.git.base
+---@class arbor.git.__info
 local M = {}
 
----@type table<string, arbor.git.internal_base_spec?>
+---@type table<string, arbor.git.info?>
 local base_spec_cache = {}
 
 setmetatable(M, {
@@ -40,7 +37,7 @@ local function resolve_spec_item(cwd, key, resolve, job_fn, ...)
 	return base_spec_cache[cwd][key]
 end
 
----@return arbor.git.internal_base_spec?
+---@return arbor.git.info?
 function M.resolve()
 	local cwd = require("arbor.lib.path").cwd()
 
@@ -98,6 +95,8 @@ function M.resolve()
 	return spec
 end
 
+---@param path string
+---@return Job
 function M.is_bare_job(path)
 	return require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
@@ -107,6 +106,8 @@ function M.is_bare_job(path)
 	})
 end
 
+---@param path string
+---@return Job
 function M.common_dir_job(path)
 	return require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
@@ -116,6 +117,8 @@ function M.common_dir_job(path)
 	})
 end
 
+---@param path string
+---@return Job
 function M.current_branch_job(path)
 	return require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
@@ -125,6 +128,8 @@ function M.current_branch_job(path)
 	})
 end
 
+---@param path string
+---@return Job
 function M.top_level_job(path)
 	return require("plenary.job"):new({
 		command = require("arbor.config").git.binary,

@@ -1,9 +1,5 @@
----@alias arbor.select.provider
----| "telescope" Use telescope.nvim
----| "fzf"       Use fzf-lua
----| "vim"       Use vim.ui.select
-
----@class arbor.tui.select
+---@alias arbor.select
+---| function(items: core.item[], opts: table, cb: function(item: core.item|nil, idx: integer|nil)): item, idx
 local M = {}
 
 local providers = {}
@@ -11,10 +7,11 @@ local providers = {}
 providers.vim = vim.ui.select
 -- TODO telescope, fzf
 
----@return function(): item, idx
-function M.select(items, opts, cb)
-	local key = require("arbor.config").select
-	return providers[key](items, opts, cb)
-end
+setmetatable(M, {
+	_call = function(items, opts, cb)
+		local key = require("arbor.config").select
+		return providers[key](items, opts, cb)
+	end,
+})
 
 return M

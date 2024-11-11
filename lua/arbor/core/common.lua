@@ -11,9 +11,9 @@ local function identity(...)
 	return ...
 end
 
----@param key arbor.core_key
----@param autocmd_prefix arbor.core_autocmd_prefix
----@param opts? arbor.core_opts
+---@param key arbor.feature
+---@param autocmd_prefix arbor.auprefix
+---@param opts? arbor.opts
 ---@return arbor.core_events
 function M.get_events(key, autocmd_prefix, opts)
 	opts = opts or {}
@@ -58,18 +58,18 @@ function M.get_events(key, autocmd_prefix, opts)
 	-- setup autocmds
 	local aupre = autocmd_prefix .. "Pre"
 	local aupost = autocmd_prefix .. "Post"
-	for _, ev in ipairs(config.events) do
+	for _, ev in ipairs(config.autocmds) do
 		if ev == aupre then
 			res["aupre"] = function(base_spec)
 				vim.api.nvim_exec_autocmds(aupre, {
-					group = require("arbor.events").get_augroup(),
+					group = require("arbor.extensions.hooks").get_augroup(),
 					data = base_spec,
 				})
 			end
 		elseif ev == aupost then
 			res["aupost"] = function(base_spec)
 				vim.api.nvim_exec_autocmds(aupre, {
-					group = require("arbor.events").get_augroup(),
+					group = require("arbor.extensions.hooks").get_augroup(),
 					data = base_spec,
 				})
 			end
@@ -81,8 +81,8 @@ end
 
 ---@param actions table<string, arbor.action>
 ---@param prefix string prefix to strip from label
----@param items? arbor.core_item[]
----@return arbor.core_item[]
+---@param items? arbor.item[]
+---@return arbor.item[]
 function M.append_actions_to_items(actions, prefix, items)
 	items = items or {}
 	for id, callback in pairs(actions) do
@@ -96,9 +96,9 @@ function M.append_actions_to_items(actions, prefix, items)
 	return items
 end
 
----@param branches? arbor.git.branch_info[]
----@param items arbor.core_item[]
----@return arbor.core_item[]
+---@param branches? arbor.git.branch[]
+---@param items arbor.item[]
+---@return arbor.item[]
 function M.add_branches_to_items(branches, items)
 	items = items or {}
 	if branches ~= nil then
@@ -109,7 +109,7 @@ function M.add_branches_to_items(branches, items)
 			end
 			table.insert(items, index, {
 				id = entry.refname,
-				label = entry.displayname,
+				label = entry.display_name,
 				type = "branch",
 				branch_info = entry,
 			})
@@ -118,14 +118,14 @@ function M.add_branches_to_items(branches, items)
 	return items
 end
 
----@param item arbor.core_item
+---@param item arbor.item
 ---@return string
 function M.generate_item_format(item)
 	return item.type .. " : " .. item.label
 end
 
----@param base_spec arbor.git.internal_base_spec
----@param item? arbor.core_item
+---@param base_spec arbor.git.info
+---@param item? arbor.item
 ---@param idx? integer
 ---@return boolean?
 function M.handle_if_action(base_spec, item, idx)

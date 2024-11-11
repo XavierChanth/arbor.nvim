@@ -7,77 +7,54 @@ setmetatable(M, {
 	end,
 })
 
-local dep_modules = {
-	select = "arbor.lib.select",
-	notify = "arbor.lib.notify",
-	input = "arbor.lib.input",
-	git_remote = "arbor.lib.remote",
-	git_branch = "arbor.lib.branch",
-	git_origin = "arbor.lib.origin",
-	path = "arbor.lib.path",
-	common = "arbor.core.common",
-	config = "arbor.config",
-}
+local config = require("arbor.config")
+local lib = require("arbor.lib")
+local common = require("arbor.core.common")
 
-local d = {}
-
-setmetatable(d, {
-	__index = function(_, k)
-		return require(dep_modules[k])
-	end,
-})
-
----@param opts arbor.core.add_opts
+---@param opts arbor.opts.add
 function M.add(opts)
-	local base_spec = require("arbor.lib.base").resolve()
-	if not base_spec or not base_spec.resolved_base then
-		d.notify.error("Failed to resolve repo base")
+	local git_info = require("arbor.lib.git.base_spec").resolve()
+	if not git_info or not git_info.resolved_base then
+		lib.notify.error("Failed to resolve repo base")
 		return
 	end
 
-	---@type arbor.core_item[]
-	local actions = d.config.actions.add or {}
-	local items = d.common.append_actions_to_items(actions, d.config.actions.prefix)
+	---@type arbor.item[]
+	local actions = config.actions.add or {}
+	local items = common.append_actions_to_items(actions, config.actions.prefix)
 
 	-- append actions
 	local include_remote_branches = opts.show_remote_branches--[[@as boolean]]
 	if opts.show_remote_branches == nil then
-		include_remote_branches = d.config.settings.add.show_remote_branches
+		include_remote_branches = config.settings.add.show_remote_branches
 	end
 
-	local branches, local_branches, remote_branches = d.git_branch.get_branches({
-		cwd = d.path.cwd(),
+	local branches, local_branches, remote_branches = lib.git.query.get_branches({
+		cwd = lib.path.cwd(),
 		include_remote_branches = include_remote_branches,
 		pattern = opts.branch_pattern,
 	})
 
-	-- TODO allow the user to opt out of this
-	for _, branch in ipairs(local_branches) do
-		branches[#branches + 1] = branch
-	end
+	items = common.add_branches_to_items(branches, items)
 
-	for _, branch in ipairs(remote_branches) do
-		branches[#branches + 1] = branch
-	end
-
-	P(branches)
-	items = d.common.add_branches_to_items(branches, items)
-
-	d.picker.select(items, {
+	lib.select(items, {
 		prompt = "Add worktree",
-		format_item = d.common.generate_item_format,
-	}, M.item_selected(opts, base_spec))
+		format_item = common.generate_item_format,
+	}, M.item_selected(opts, git_info, local_branches or {}))
 end -- end of add
 
-function M.item_selected(opts, base_spec)
+---@param opts arbor.opts.add
+---@param git_info arbor.git.info
+---@param local_branches arbor.git.branch[]
+function M.item_selected(opts, git_info, local_branches)
 	return function(item, idx)
-		if not d.common.handle_if_action(base_spec, item, idx) then
+		if not common.handle_if_action(git_info, item, idx) then
 			return
 		end
 
 		if item.type == "branch" then
 			if not item.branch_info then
-				d.notify.error("Failed to extract branch info from git")
+				lib.notify.error("Failed to extract branch info from git")
 				return
 			end
 		end
@@ -90,43 +67,53 @@ function M.item_selected(opts, base_spec)
 			end
 		end
 
-		M.create_worktree(opts, base_spec, item)
+		if opts.path_style == "smart" then
+			local remotes = lib.git.query.list_remotes(git_info.common_dir) or {}
+			local found = false
+			for _, remote in ipairs(remotes) do
+				if git_info.branch_info.display_name:find("^" .. remote) then
+					git_info.new_path = git_info.branch_info.display_name:sub(#remote + 1)
+					found = true
+					break
+				end
+			end
+			if not found then
+				opts.path_style = "same"
+			end
+		end
+
+		if opts.path_style == "same" then
+			git_info.new_path = git_info.branch_info.display_name
+		elseif type(opts.path_style) == "function" then
+			git_info.new_path = opts.path_style(git_info, local_branches)
+		elseif opts.path_style == "prompt" then
+			lib.input({
+				prompt = "Path for the worktree",
+			}, M.create_worktree(opts, git_info, item))
+			return
+		end
+
+		-- nil implies that the branch_name is already stored in base_spec
+		-- (when not a callback from input)
+		M.create_worktree(opts, git_info, item, true)(nil)
 	end
 end
 
-function M.create_worktree(opts, base_spec, item)
-	if opts.name_branch == "smart" then
-		local remotes = d.git_origin.list_remotes({
-			cwd = base_spec.common_dir,
-		}) or {}
-		local found = false
-		for _, remote in ipairs(remotes) do
-			if base_spec.branch_info.display_name:find("^" .. remote) then
-				base_spec.new_branch = base_spec.branch_info.display_name:sub(#remote + 1)
-				found = true
-				break
-			end
+function M.create_worktree(opts, base_spec, item, is_sync)
+	return function(branch_name)
+		if branch_name then
+			base_spec.new_branch = branch_name
+		elseif not is_sync then
+			-- user canceled the input
+			return
 		end
-		if not found then
-			opts.name_branch = "same"
-		end
-	end
-	if opts.name_branch == "same" then
-		base_spec.new_branch = base_spec.branch_info.display_name
-	elseif type(opts.name_branch) == "function" then
-		local branches = d.git_branch.get_local_working_branches({ cwd = base_spec.common_dir })
-		base_spec.new_branch = opts.name_branch(base_spec, branches)
-	elseif opts.name_branch == "prompt" then
-		base_spec.new_branch = d.input.synchronize({
-			prompt = "Name local branch",
+
+		local events = common.get_events("add", "ArborAdd")
+		P({
+			base_spec,
+			item,
 		})
 	end
-
-	local events = d.common.get_events("add", "ArborAdd")
-	P({
-		base_spec,
-		item,
-	})
 end
 
 return M

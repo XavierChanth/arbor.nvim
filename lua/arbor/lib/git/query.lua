@@ -1,27 +1,13 @@
----@class arbor.git.branch
+---@class arbor.git.__query
 local M = {}
-
 -- Parts of get_branches are referenced from telescope.nvim and subject to the following license:
 -- Copyright (c) 2020-2021 nvim-telescope
 --
 -- Referenced code:
 -- https://github.com/nvim-telescope/telescope.nvim/blob/85922dde3767e01d42a08e750a773effbffaea3e/lua/telescope/builtin/__git.lua#L246
 
----@class arbor.git.branch_info
----@field head boolean
----@field main_branch boolean?
----@field refname string
----@field upstream string?
----@field worktreepath string?
----@field displayname string
-
----@class arbor.git.get_branches_opts
----@field pattern? string
----@field cwd? string
----@field include_remote_branches boolean?
-
 ---@param opts? arbor.git.get_branches_opts
----@return arbor.git.branch_info[]?, arbor.git.branch_info[]?, arbor.git.branch_info[]?
+---@return arbor.git.branch[]?, arbor.git.branch[]?, arbor.git.branch[]?
 function M.get_branches(opts)
 	opts = opts or {}
 	local format = "%(HEAD)" .. "%(refname)" .. "%(upstream:lstrip=2)" .. "%(worktreepath)"
@@ -51,9 +37,11 @@ function M.get_branches(opts)
 	local unescape_single_quote = function(v)
 		return string.gsub(v, "\\([\\'])", "%1")
 	end
-	---@type arbor.git.branch_info[]
+	---@type arbor.git.branch[]
 	local priority_branches = {}
+	---@type arbor.git.branch[]
 	local local_branches = {}
+	---@type arbor.git.branch[]
 	local remote_branches = {}
 	local main_branches = require("arbor.config").git.main_branch or {}
 	if type(main_branches) == "string" then
@@ -108,6 +96,23 @@ function M.get_branches(opts)
 	end
 
 	return priority_branches, local_branches, remote_branches
+end
+
+---@param cwd? string
+---@return string[] | nil
+function M.list_remotes(cwd)
+	local job = require("plenary.job"):new({
+		command = require("arbor.config").git.binary,
+		args = { "remote" },
+		cwd = cwd or require("arbor.lib.path").cwd(),
+		enabled_recording = true,
+	})
+
+	local res, code = job:sync()
+	if code ~= 0 then
+		return
+	end
+	return res
 end
 
 return M

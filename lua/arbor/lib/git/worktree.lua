@@ -1,4 +1,4 @@
----@class arbor.git.worktree
+---@class arbor.git.__worktree
 local M = {}
 
 ---@param path? string
@@ -16,9 +16,7 @@ function M.is_inside(path)
 	return exit_code == 0 and res[1] == "true"
 end
 
----@param opts? arbor.git.worktree.add
----@return nil
-function M.add(opts)
+function M.add(git_info, branch, path, refname)
 	--
 end
 

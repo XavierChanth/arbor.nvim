@@ -1,4 +1,4 @@
----@class arbor.git.path
+---@class arbor.path
 local M = {}
 -- Lazy.nvim and LazyVim don't have a proper copyright in the licenses
 -- so I've provided permalinks to where the code is from

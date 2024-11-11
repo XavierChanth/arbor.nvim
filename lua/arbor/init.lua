@@ -1,9 +1,18 @@
+-- core utilities
 ---@class arbor
----@field actions arbor.actions
 ---@field config arbor.config
----@field events arbor.events
----@field git arbor.git
+---@field lib arbor.lib
+
+-- core features
+---@class arbor
 ---@field add arbor.core.add
+
+-- extensions
+---@class arbor
+---@field events arbor.events
+---@field actions arbor.actions
+
+---@class arbor
 local M = {}
 
 local modules = {
@@ -20,7 +29,7 @@ setmetatable(M, {
 	end,
 })
 
----@param opts arbor.config_opts
+---@param opts arbor.config
 ---@return nil
 function M.setup(opts)
 	require("arbor.config").set(opts)

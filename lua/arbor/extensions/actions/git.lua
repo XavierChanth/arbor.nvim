@@ -1,4 +1,4 @@
----@class arbor.actions.git: arbor.actions_spec
+---@class arbor.actions.git: arbor.actions
 local M = {}
 
 -- TODO: add git presets:

@@ -79,7 +79,7 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			git_info.branch_info = item.branch_info
 		end
 
-		-- FIXME: this if is being skipped
+		-- FIXME: this is being skipped
 		if item.worktreepath and string.len(item.worktreepath) > 0 then
 			if opts.switch_if_wt_exists then
 				-- TODO: switch instead of add
@@ -118,16 +118,12 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			git_info.new_path = opts.path_style(git_info, local_branches)
 		end
 
-		-- TODO check if path already in use and prompt
-
 		if opts.path_style == "prompt" then
 			lib.input({
 				prompt = "Path for the worktree",
 			}, M.after_path_selected(opts, git_info))
 			return
 		end
-
-		-- TODO check if path already in use and return
 
 		M.after_path_selected(opts, git_info, true)()
 	end
@@ -194,7 +190,6 @@ function M.after_branch_selected(opts, git_info, is_sync)
 			events.aupre(git_info)
 		end
 
-		-- TODO: fix detached issues
 		if not lib.git.worktree.add(git_info, git_info.new_path, git_info.new_branch, opts.guess_remote) then
 			return
 		end

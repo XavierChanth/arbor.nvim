@@ -203,7 +203,9 @@ function M.after_branch_selected(opts, git_info, is_sync)
 end
 
 setmetatable(M, {
-	__call = M.add,
+	__call = function(_, opts)
+		return M.add(opts)
+	end,
 })
 
 return M

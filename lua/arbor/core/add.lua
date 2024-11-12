@@ -1,11 +1,5 @@
----@class arbor.core.add
+---@class arbor.core.add.internal
 local M = {}
-
-setmetatable(M, {
-	__call = function(...)
-		M.add(...)
-	end,
-})
 
 local config = require("arbor.config")
 local lib = require("arbor.lib")
@@ -25,7 +19,10 @@ function M.add(opts)
 
 	local actions = config.actions.add or {}
 	---@type arbor.item[]
-	local items = common.append_actions_to_items(actions)
+	local items = {}
+	if opts.show_actions then
+		items = common.append_actions_to_items(actions)
+	end
 
 	local include_remote_branches = opts.show_remote_branches--[[@as boolean]]
 	if opts.show_remote_branches == nil then
@@ -50,10 +47,12 @@ function M.add(opts)
 
 	local callback = M.after_ref_selected(opts, git_info, local_branches or {})
 
-	lib.select(items, {
+	local select_opts = opts.select_opts or {
 		prompt = "Add worktree",
 		format_item = common.generate_item_format,
-	}, callback)
+	}
+
+	lib.select(items, select_opts, callback)
 end -- end of add
 
 ---@param opts arbor.opts.add
@@ -119,9 +118,10 @@ function M.after_ref_selected(opts, git_info, local_branches)
 		end
 
 		if opts.path_style == "prompt" then
-			lib.input({
+			local input_opts = opts.path_input_opts or {
 				prompt = "Path for the worktree",
-			}, M.after_path_selected(opts, git_info))
+			}
+			lib.input(input_opts, M.after_path_selected(opts, git_info))
 			return
 		end
 
@@ -160,9 +160,10 @@ function M.after_path_selected(opts, git_info, is_sync)
 		end
 
 		if opts.branch_style == "prompt" then
-			lib.input({
+			local input_opts = opts.branch_input_opts or {
 				prompt = "Name for the branch",
-			}, M.after_branch_selected(opts, git_info))
+			}
+			lib.input(input_opts, M.after_branch_selected(opts, git_info))
 			return
 		end
 
@@ -185,7 +186,7 @@ function M.after_branch_selected(opts, git_info, is_sync)
 		end
 
 		local events = common.get_events("add", "ArborAdd")
-		git_info = events.hookpre(git_info)
+		git_info = events.hookpre(git_info) or git_info
 		if events.aupre then
 			events.aupre(git_info)
 		end
@@ -194,11 +195,15 @@ function M.after_branch_selected(opts, git_info, is_sync)
 			return
 		end
 
-		git_info = events.hookpost(git_info)
+		git_info = events.hookpost(git_info) or git_info
 		if events.aupost then
 			events.aupost(git_info)
 		end
 	end
 end
+
+setmetatable(M, {
+	__index = M.add,
+})
 
 return M

@@ -30,20 +30,20 @@ function M.get_events(key, autocmd_prefix, opts)
 	if opts.preserve_default_hooks then
 		res = {
 			hookpre = function(git_info)
-				if config.hooks[hookpre] and config.hooks[hookpre] then
-					git_info = config.hooks[hookpre](git_info)
+				if config.hooks[hookpre] then
+					git_info = config.hooks[hookpre](git_info) or git_info
 				end
 				if opts.hooks.pre then
-					git_info = opts.hooks.pre(git_info)
+					git_info = opts.hooks.pre(git_info) or git_info
 				end
 				return git_info
 			end,
 			hookpost = function(git_info)
-				if config.hooks[hookpost] and config.hooks[hookpost] then
-					git_info = config.hooks[hookpost](git_info)
+				if config.hooks[hookpost] then
+					git_info = config.hooks[hookpost](git_info) or git_info
 				end
 				if opts.hooks.post then
-					git_info = opts.hooks.post(git_info)
+					git_info = opts.hooks.post(git_info) or git_info
 				end
 				return git_info
 			end,

@@ -23,6 +23,7 @@ local default_config = {
 			--- Worktree behaviour
 			switch_if_wt_exists = true, -- Automatically switch if theres a working path
 			guess_remote = false, -- Tell git to guess the remote (see man git-worktree)
+			show_actions = true, -- Show actions by default
 		},
 		delete = {},
 		switch = {},

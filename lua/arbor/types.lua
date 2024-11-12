@@ -67,7 +67,11 @@
 
 ---@class arbor.opts
 ---@field hooks? arbor.hook_pair
+---@field path_input_opts? table gets passed to vim.ui.input for path
+---@field branch_input_opts? table gets passed to vim.ui.input for new branch
+---@field select_opts? table gets passed to vim.ui.select for source branch
 ---@field preserve_default_hooks? boolean
+---TODO: telescope, fzf configurable
 
 ---@class arbor.opts.select
 ---@field prompt? string
@@ -85,6 +89,11 @@
 ---@field switch_if_wt_exists? boolean
 ---@field force_prompt? boolean
 ---@field guess_remote? boolean
+---@field show_actions? boolean
+---TODO: add option try to find a good remote
+
+---@alias arbor.core.add
+---| function(opts: arbor.opts.add|nil)
 
 ---@class arbor.opts.delete :arbor.opts
 
@@ -165,7 +174,7 @@
 ---###Actions
 
 ---@alias arbor.action
----| function(info: arbor.git.info): arbor.git.info|nil
+---| function(info: arbor.git.info, ...: any): arbor.git.info|nil
 
 ---### Hooks
 
@@ -235,6 +244,7 @@
 ---@field switch_if_wt_exists boolean
 ---@field force_prompt boolean
 ---@field guess_remote boolean
+---@field show_actions boolean
 
 ---@class arbor.opts.select.internal
 ---@field prompt string

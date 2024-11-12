@@ -36,7 +36,7 @@ local default_config = {
 	worktree = {
 		normal = {
 			base = "relative_common",
-			path = "../",
+			path = "..",
 		},
 		bare = {
 			base = "relative_common",

@@ -58,7 +58,7 @@ function M.resolve()
 	end
 
 	if
-		not resolve_spec_item(cwd, "path", function(res, code, _)
+		not resolve_spec_item(cwd, "toplevel", function(res, code, _)
 			if code ~= 0 then
 				return cwd
 			end
@@ -69,6 +69,7 @@ function M.resolve()
 	end
 
 	local spec = base_spec_cache[cwd] or {}
+	spec.cwd = cwd
 	-- validate worktree config for repo_type
 	local config = require("arbor.config").worktree[spec.repo_type] --[[@as arbor.config.worktree_spec]]
 	if not config or not config.base or not config.path then
@@ -86,10 +87,12 @@ function M.resolve()
 
 	if config.base == "absolute" then
 		spec.resolved_base = path
-	elseif config.base == "relative_cwd" then
+	elseif config.base == "relative_common" then
 		spec.resolved_base = require("arbor.lib.path").realpath(spec.common_dir .. "/" .. path)
-	else
+	elseif config.base == "relative_cwd" then
 		spec.resolved_base = require("arbor.lib.path").realpath(cwd .. "/" .. path)
+	else
+		return nil
 	end
 
 	return spec

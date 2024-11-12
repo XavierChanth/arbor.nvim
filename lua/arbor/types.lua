@@ -139,7 +139,8 @@
 ---@class arbor.git.info
 ---@field operation_opts? arbor.opts
 ---@field branch string
----@field path string
+---@field cwd string
+---@field toplevel string
 ---@field repo_type arbor.git.repo_type
 ---@field common_dir string
 ---@field resolved_base? string

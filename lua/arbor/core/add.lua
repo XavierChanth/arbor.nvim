@@ -2,7 +2,7 @@
 local M = {}
 
 local config = require("arbor.config")
-local lib = require("arbor.lib")
+local lib = require("arbor._lib")
 local common = require("arbor.core.common")
 
 ---@param opts? arbor.opts.add

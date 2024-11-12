@@ -1,5 +1,5 @@
 ---@class arbor.lib
----@field git arbor.git
+---@field git arbor.lib.git
 ---@field input arbor.input
 ---@field notify arbor.notify
 ---@field path arbor.path
@@ -8,7 +8,7 @@ local M = {}
 
 setmetatable(M, {
 	__index = function(_, k)
-		return require("arbor.lib." .. k)
+		return require("arbor._lib." .. k)
 	end,
 })
 

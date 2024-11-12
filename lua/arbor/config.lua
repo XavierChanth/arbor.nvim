@@ -4,6 +4,7 @@ local default_config = {
 	select = "vim",
 	input = "vim",
 	notify = {
+		lib = false,
 		---@type boolean
 		enabled = true,
 		---@type integer|nil

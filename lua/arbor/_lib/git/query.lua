@@ -1,4 +1,4 @@
----@class arbor.git.__query
+---@class arbor.lib.git.query
 local M = {}
 -- Parts of get_branches are referenced from telescope.nvim and subject to the following license:
 -- Copyright (c) 2020-2021 nvim-telescope
@@ -36,7 +36,7 @@ function M.get_branches(opts)
 	local job = require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
 		args = git_args,
-		cwd = opts.cwd or require("arbor.lib.path").cwd(),
+		cwd = opts.cwd or require("arbor._lib.path").cwd(),
 		enabled_recording = true,
 	})
 
@@ -116,7 +116,7 @@ function M.list_remotes(cwd)
 	local job = require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
 		args = { "remote" },
-		cwd = cwd or require("arbor.lib.path").cwd(),
+		cwd = cwd or require("arbor._lib.path").cwd(),
 		enabled_recording = true,
 	})
 

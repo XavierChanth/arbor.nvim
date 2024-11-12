@@ -1,4 +1,4 @@
----@class arbor.git.__porcelain
+---@class arbor.lib.git.porcelain
 local M = {}
 
 ---@return Job
@@ -6,7 +6,7 @@ local function fetch_job(base_spec, remote, branch, local_name)
 	return require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
 		args = { "fetch", remote, branch .. ":" .. local_name },
-		cwd = base_spec.common_dir or require("arbor.lib.path").cwd(),
+		cwd = base_spec.common_dir or require("arbor._lib.path").cwd(),
 		enabled_recording = false,
 	})
 end

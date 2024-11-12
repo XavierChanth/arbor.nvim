@@ -1,4 +1,4 @@
----@class arbor.git.__info
+---@class arbor.lib.git.info
 local M = {}
 
 ---@type table<string, arbor.git.info?>
@@ -10,7 +10,7 @@ setmetatable(M, {
 
 local function default_resolve(res, code, job)
 	if code ~= 0 then
-		require("arbor.lib.notify").warn(job:stderr_result()[1])
+		require("arbor._lib.notify").warn(job:stderr_result()[1])
 		return
 	end
 	return res[1]
@@ -37,9 +37,10 @@ local function resolve_spec_item(cwd, key, resolve, job_fn, ...)
 	return base_spec_cache[cwd][key]
 end
 
+---@param cwd? string
 ---@return arbor.git.info?
-function M.resolve()
-	local cwd = require("arbor.lib.path").cwd()
+function M.resolve(cwd)
+	cwd = cwd or require("arbor._lib.path").cwd()
 
 	if
 		not resolve_spec_item(cwd, "repo_type", function(res)
@@ -73,7 +74,7 @@ function M.resolve()
 	-- validate worktree config for repo_type
 	local config = require("arbor.config").worktree[spec.repo_type] --[[@as arbor.config.worktree_spec]]
 	if not config or not config.base or not config.path then
-		require("arbor.lib.notify").warn(
+		require("arbor._lib.notify").warn(
 			"Malformed arbor config: opts.worktree." .. spec.repo_type .. " contains a null value for a required field"
 		)
 		return
@@ -88,9 +89,9 @@ function M.resolve()
 	if config.base == "absolute" then
 		spec.resolved_base = path
 	elseif config.base == "relative_common" then
-		spec.resolved_base = require("arbor.lib.path").realpath(spec.common_dir .. "/" .. path)
+		spec.resolved_base = require("arbor._lib.path").realpath(spec.common_dir .. "/" .. path)
 	elseif config.base == "relative_cwd" then
-		spec.resolved_base = require("arbor.lib.path").realpath(cwd .. "/" .. path)
+		spec.resolved_base = require("arbor._lib.path").realpath(cwd .. "/" .. path)
 	else
 		return nil
 	end

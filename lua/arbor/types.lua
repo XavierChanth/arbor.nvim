@@ -20,6 +20,7 @@
 ---@field enabled? boolean
 ---@field level? integer
 ---@field opts? table
+---@field lib? boolean
 
 ---@class arbor.config.settings
 ---@field add? arbor.opts.add
@@ -226,6 +227,7 @@
 ---@field enabled boolean
 ---@field level integer
 ---@field opts table
+---@field lib boolean
 
 ---@class arbor.config.settings.internal
 ---@field add arbor.opts.add.internal

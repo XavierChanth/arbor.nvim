@@ -1,4 +1,4 @@
----@class arbor.git.__worktree
+---@class arbor.lib.git.worktree
 local M = {}
 
 ---@param path? string

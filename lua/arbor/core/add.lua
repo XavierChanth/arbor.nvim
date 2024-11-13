@@ -57,7 +57,7 @@ end -- end of add
 
 ---@param opts arbor.opts.add
 ---@param git_info arbor.git.info
----@param local_branches arbor.git.branch[]
+---@param local_branches? arbor.git.branch[]
 function M.after_ref_selected(opts, git_info, local_branches)
 	return function(item, idx)
 		git_info.operation_opts = opts
@@ -104,7 +104,6 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			if #matches == 1 then
 				git_info.new_path = matches[1]
 			else
-				lib.notify.info("Unable to resolve smart path name, prompting for path")
 				opts.path_style = "same"
 			end
 		end
@@ -119,19 +118,20 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			local input_opts = opts.path_input_opts or {
 				prompt = "Path for the worktree",
 			}
-			lib.input(input_opts, M.after_path_selected(opts, git_info))
+			lib.input(input_opts, M.after_path_selected(opts, git_info, local_branches))
 			return
 		end
 
-		M.after_path_selected(opts, git_info, true)()
+		M.after_path_selected(opts, git_info, local_branches, true)()
 	end
 end
 
 ---@param opts arbor.opts.add
 ---@param git_info arbor.git.info
+---@param local_branches? arbor.git.branch[]
 ---@param is_sync? boolean
 ---@diagnostic disable-next-line: unused-local
-function M.after_path_selected(opts, git_info, is_sync)
+function M.after_path_selected(opts, git_info, local_branches, is_sync)
 	return function(path)
 		if path then
 			git_info.new_path = path
@@ -161,19 +161,20 @@ function M.after_path_selected(opts, git_info, is_sync)
 			local input_opts = opts.branch_input_opts or {
 				prompt = "Name for the branch",
 			}
-			lib.input(input_opts, M.after_branch_selected(opts, git_info))
+			lib.input(input_opts, M.after_branch_selected(opts, git_info, local_branches))
 			return
 		end
 
-		M.after_branch_selected(opts, git_info, true)(nil)
+		M.after_branch_selected(opts, git_info, local_branches, true)(nil)
 	end
 end
 
 ---@param opts arbor.opts.add
 ---@param git_info arbor.git.info
+---@param local_branches? arbor.git.branch[]
 ---@param is_sync? boolean
 ---@diagnostic disable-next-line: unused-local
-function M.after_branch_selected(opts, git_info, is_sync)
+function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 	---@param branch string|nil
 	return function(branch)
 		if branch then
@@ -187,6 +188,15 @@ function M.after_branch_selected(opts, git_info, is_sync)
 		git_info = events.hookpre(git_info) or git_info
 		if events.aupre then
 			events.aupre(git_info)
+		end
+
+		if git_info.new_branch then
+			local ref = "refs/heads/" .. git_info.new_branch
+			for _, b in ipairs(local_branches or {}) do
+				if b.refname == ref then
+					git_info.new_branch = nil
+				end
+			end
 		end
 
 		if not lib.git.worktree.add(git_info, git_info.new_path, git_info.new_branch) then

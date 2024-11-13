@@ -13,7 +13,7 @@ return function(info, opts)
 	opts = vim.tbl_extend("force", {
 		workdir = "new_path",
 		quiet = false,
-	}, opts)
+	}, opts or {})
 
 	if not info or not info.branch_info then
 		if not opts.quiet then
@@ -25,6 +25,9 @@ return function(info, opts)
 		if not opts.quiet then
 			require("arbor._lib.notify").warn("Push upstream failed: new path not set")
 		end
+		return
+	end
+	if info.branch_info.refname:find("^refs/heads/") then
 		return
 	end
 

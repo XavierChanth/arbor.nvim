@@ -87,11 +87,6 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			return
 		end
 
-		if opts.force_prompt then
-			opts.path_style = "prompt"
-			opts.branch_style = "prompt"
-		end
-
 		if opts.path_style == "basename" then
 			git_info.new_path = vim.fs.basename(git_info.branch_info.display_name)
 		elseif opts.path_style == "smart" then
@@ -191,7 +186,7 @@ function M.after_branch_selected(opts, git_info, is_sync)
 			events.aupre(git_info)
 		end
 
-		if not lib.git.worktree.add(git_info, git_info.new_path, git_info.new_branch, opts.guess_remote) then
+		if not lib.git.worktree.add(git_info, git_info.new_path, git_info.new_branch) then
 			return
 		end
 

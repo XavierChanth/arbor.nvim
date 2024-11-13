@@ -1,8 +1,17 @@
 ---@class arbor.actions
 ---@field add_new_branch arbor.actions.add_new_branch
+---@field cd_new_path arbor.action
+---@field fetch arbor.actions.fetch
+---@field push_upstream arbor.actions.push_upstream
 
 ---@alias arbor.actions.add_new_branch
 ---| function(info?: arbor.git.info, opts?:arbor.opts.add): arbor.git.info|nil
+
+---@alias arbor.actions.fetch
+---| function(info?: arbor.git.info, opts?:arbor.opts.fetch.opts): arbor.git.info|nil
+
+---@alias arbor.actions.push_upstream
+---| function(info?: arbor.git.info, opts?:arbor.opts.push_upstream.opts): arbor.git.info|nil
 
 -- TODO import from external files, so all actions are not loaded with this file
 

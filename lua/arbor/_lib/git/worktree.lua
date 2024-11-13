@@ -19,9 +19,8 @@ end
 ---@param git_info arbor.git.info
 ---@param path string
 ---@param branch string?
----@param guess_remote? boolean
 ---@return boolean success
-function M.add(git_info, path, branch, guess_remote)
+function M.add(git_info, path, branch)
 	local args = {
 		"worktree",
 		"add",
@@ -37,10 +36,6 @@ function M.add(git_info, path, branch, guess_remote)
 		table.insert(args, 3, "-b")
 	end
 
-	if guess_remote then
-		table.insert(args, 3, "--guess-remote")
-	end
-
 	local job = require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
 		args = args,
@@ -50,7 +45,7 @@ function M.add(git_info, path, branch, guess_remote)
 
 	local _, code = job:sync()
 	if code ~= 0 then
-		require("arbor").lib.notify.error(table.concat(job:stderr_result(), "\n"))
+		require("arbor._lib.notify").error(table.concat(job:stderr_result(), "\n"))
 	end
 
 	return code == 0

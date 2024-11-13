@@ -50,7 +50,7 @@ function M.get_events(key, autocmd_prefix, opts)
 		}
 	else
 		res = {
-			hookpre = opts.hooks.pre or config.hooks[hookpre] and config.hooks[hookpost] or identity,
+			hookpre = opts.hooks.pre or config.hooks[hookpre] and config.hooks[hookpre] or identity,
 			hookpost = opts.hooks.post or config.hooks[hookpost] and config.hooks[hookpost] or identity,
 		}
 	end

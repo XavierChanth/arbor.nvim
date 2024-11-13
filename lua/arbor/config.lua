@@ -20,10 +20,8 @@ local default_config = {
 			--- Naming resolution
 			path_style = "smart", -- How we detect path name for a ref
 			branch_style = "path", -- path will set the branch name to the same as the resolved path (relative to base)
-			force_prompt = false, -- Force prompt, useful for adding new worktrees from an existing branch
 			--- Worktree behaviour
 			switch_if_wt_exists = true, -- Automatically switch if theres a working path
-			guess_remote = false, -- Tell git to guess the remote (see man git-worktree)
 			show_actions = true, -- Show actions by default
 		},
 		delete = {},

@@ -88,10 +88,7 @@
 ---@field branch_style? arbor.opts.add.branch_style
 ---@field show_remote_branches? boolean
 ---@field switch_if_wt_exists? boolean
----@field force_prompt? boolean
----@field guess_remote? boolean
 ---@field show_actions? boolean
----TODO: add option try to find a good remote
 
 ---@alias arbor.core.add
 ---| function(opts: arbor.opts.add|nil)
@@ -245,8 +242,6 @@
 ---@field branch_style arbor.opts.add.branch_style
 ---@field path_style arbor.opts.add.path_style
 ---@field switch_if_wt_exists boolean
----@field force_prompt boolean
----@field guess_remote boolean
 ---@field show_actions boolean
 
 ---@class arbor.opts.select.internal

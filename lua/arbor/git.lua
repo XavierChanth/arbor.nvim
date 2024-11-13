@@ -13,7 +13,7 @@ local M = {}
 ---@return Job
 function M.job(opts)
 	opts.command = opts.command or require("arbor.config").git.binary
-	return require("plenary.job")(opts)
+	return require("plenary.job"):new(opts)
 end
 
 ---Get the arbor.git.info object for the cwd (optional)

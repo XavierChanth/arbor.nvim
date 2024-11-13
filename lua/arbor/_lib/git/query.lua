@@ -65,7 +65,7 @@ function M.get_branches(opts)
 			head = fields[1] == "*",
 			refname = unescape_single_quote(fields[2]),
 			upstream = unescape_single_quote(fields[3]),
-			worktreepath = unescape_single_quote(fields[4]),
+			worktree_path = unescape_single_quote(fields[4]),
 		}
 
 		local prefix

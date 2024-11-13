@@ -1,8 +1,11 @@
 ---@class arbor.actions
 ---@field add_new_branch arbor.actions.add_new_branch
+---@field cd_existing_worktree arbor.action
 ---@field cd_new_path arbor.action
 ---@field fetch arbor.actions.fetch
 ---@field push_upstream arbor.actions.push_upstream
+---@field tcd_existing_worktree arbor.action
+---@field tcd_new_path arbor.action
 
 ---@alias arbor.actions.add_new_branch
 ---| function(info?: arbor.git.info, opts?:arbor.opts.add): arbor.git.info|nil

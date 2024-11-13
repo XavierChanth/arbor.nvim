@@ -84,11 +84,12 @@
 
 ---@class arbor.opts.add : arbor.opts
 ---@field branch_pattern? string
----@field path_style? arbor.opts.add.path_style
 ---@field branch_style? arbor.opts.add.branch_style
----@field show_remote_branches? boolean
----@field switch_if_wt_exists? boolean
+---@field path_style? arbor.opts.add.path_style
 ---@field show_actions? boolean
+---@field show_remote_branches? boolean
+---@field switch_hooks? arbor.hook_pair
+---@field switch_if_wt_exists? boolean
 
 ---@alias arbor.core.add
 ---| function(opts: arbor.opts.add|nil)

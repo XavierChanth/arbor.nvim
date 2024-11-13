@@ -78,12 +78,15 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			git_info.branch_info = item.branch_info
 		end
 
-		-- FIXME: this is being skipped
-		if item.worktreepath and string.len(item.worktreepath) > 0 then
-			if opts.switch_if_wt_exists then
-				-- TODO: switch instead of add
-				vim.print("TODO: auto switch")
-			end
+		if
+			opts.switch_if_wt_exists
+			and item.branch_info
+			and item.branch_info.worktree_path
+			and string.len(item.branch_info.worktree_path) > 0
+		then
+			git_info = opts.switch_hooks and opts.switch_hooks.pre and opts.switch_hooks.pre(git_info) or git_info
+			git_info = require("arbor.actions.cd_existing_worktree")(git_info) or git_info
+			git_info = opts.switch_hooks and opts.switch_hooks.post and opts.switch_hooks.post(git_info) or git_info
 			return
 		end
 

@@ -76,7 +76,7 @@ function M.after_ref_selected(opts, git_info)
 			git_info.branch_info = item.branch_info
 		end
 
-		local events = common.get_events("remove", "ArborRemove")
+		local events = common.get_events("remove", "ArborRemove", opts)
 		git_info = events.hookpre(git_info) or git_info
 		if events.aupre then
 			events.aupre(git_info)

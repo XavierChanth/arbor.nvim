@@ -182,7 +182,7 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 			return
 		end
 
-		local events = common.get_events("add", "ArborAdd")
+		local events = common.get_events("add", "ArborAdd", opts)
 		git_info = events.hookpre(git_info) or git_info
 		if events.aupre then
 			events.aupre(git_info)

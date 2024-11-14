@@ -24,9 +24,10 @@ function M.pick(opts)
 		items = common.append_actions_to_items(actions)
 	end
 
-	local priority_branches, local_branches = lib.git.query.get_branches({
+	local priority_branches, local_branches, remote_branches = lib.git.query.get_branches({
 		cwd = lib.path.cwd(),
 		pattern = opts.branch_pattern,
+		include_remote_branches = opts.show_remote_branches,
 	})
 	local branches = {}
 
@@ -37,6 +38,12 @@ function M.pick(opts)
 	end
 
 	for _, branch in ipairs(local_branches or {}) do
+		if branch.worktree_path and string.len(branch.worktree_path) > 0 then
+			branches[#branches + 1] = branch
+		end
+	end
+
+	for _, branch in ipairs(remote_branches or {}) do
 		if branch.worktree_path and string.len(branch.worktree_path) > 0 then
 			branches[#branches + 1] = branch
 		end
@@ -75,7 +82,7 @@ function M.after_ref_selected(opts, git_info)
 			git_info.branch_info = item.branch_info
 		end
 
-		local events = common.get_events("pick", "ArborPick")
+		local events = common.get_events("pick", "ArborPick", opts)
 		git_info = events.hookpre(git_info) or git_info
 		if events.aupre then
 			events.aupre(git_info)

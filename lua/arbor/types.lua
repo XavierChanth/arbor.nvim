@@ -87,8 +87,8 @@
 ---@class arbor.opts.add : arbor.opts
 ---@field branch_style? arbor.opts.add.branch_style
 ---@field path_style? arbor.opts.add.path_style
----@field show_remote_branches? boolean
 ---@field on_existing? arbor.action | false
+---@field show_remote_branches? boolean
 
 ---@alias arbor.core.add
 ---| function(opts: arbor.opts.add|nil)
@@ -103,6 +103,7 @@
 ---@field force? boolean
 
 ---@class arbor.opts.pick : arbor.opts
+---@field show_remote_branches? boolean
 
 ---@class arbor.opts.move : arbor.opts
 

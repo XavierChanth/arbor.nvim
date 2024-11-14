@@ -28,6 +28,7 @@ local default_config = {
 		},
 		pick = {
 			show_actions = true,
+			show_remote_branches = false, -- Include remote branches
 		},
 		move = {
 			show_actions = true,

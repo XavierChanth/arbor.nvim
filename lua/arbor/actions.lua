@@ -3,7 +3,8 @@
 ---@field cd_existing_worktree arbor.action
 ---@field cd_new_path arbor.action
 ---@field fetch arbor.actions.fetch
----@field push_upstream arbor.actions.push_upstream
+---@field pick_if_current arbor.actions.pick_if_current
+---@field set_upstream arbor.actions.set_upstream
 ---@field tcd_existing_worktree arbor.action
 ---@field tcd_new_path arbor.action
 
@@ -13,8 +14,11 @@
 ---@alias arbor.actions.fetch
 ---| function(info?: arbor.git.info, opts?:arbor.opts.fetch.opts): arbor.git.info|nil
 
----@alias arbor.actions.push_upstream
----| function(info?: arbor.git.info, opts?:arbor.opts.push_upstream.opts): arbor.git.info|nil
+---@alias arbor.actions.pick_if_current
+---| function(info?: arbor.git.info, opts?:arbor.opts.pick): arbor.git.info|nil
+
+---@alias arbor.actions.set_upstream
+---| function(info?: arbor.git.info, opts?:arbor.opts.set_upstream.opts): arbor.git.info|nil
 
 -- TODO import from external files, so all actions are not loaded with this file
 

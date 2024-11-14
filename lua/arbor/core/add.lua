@@ -47,10 +47,10 @@ function M.add(opts)
 
 	local callback = M.after_ref_selected(opts, git_info, local_branches or {})
 
-	local select_opts = opts.select_opts or {
+	local select_opts = vim.tbl_deep_extend("force", {
 		prompt = "Add worktree",
 		format_item = common.generate_item_format,
-	}
+	}, opts.select_opts or {})
 
 	lib.select(items, select_opts, callback)
 end -- end of add
@@ -79,14 +79,12 @@ function M.after_ref_selected(opts, git_info, local_branches)
 		end
 
 		if
-			opts.switch_if_wt_exists
+			opts.on_existing
 			and item.branch_info
 			and item.branch_info.worktree_path
 			and string.len(item.branch_info.worktree_path) > 0
 		then
-			git_info = opts.switch_hooks and opts.switch_hooks.pre and opts.switch_hooks.pre(git_info) or git_info
-			git_info = require("arbor.actions.cd_existing_worktree")(git_info) or git_info
-			git_info = opts.switch_hooks and opts.switch_hooks.post and opts.switch_hooks.post(git_info) or git_info
+			git_info = opts.on_existing(git_info) or git_info
 			return
 		end
 
@@ -190,10 +188,11 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 			events.aupre(git_info)
 		end
 
+		-- Check to see if that branch already exists, if so don't create a new one
 		if git_info.new_branch then
-			local ref = "refs/heads/" .. git_info.new_branch
+			local match = "refs/heads/" .. git_info.new_branch
 			for _, b in ipairs(local_branches or {}) do
-				if b.refname == ref then
+				if b.refname == match then
 					git_info.new_branch = nil
 				end
 			end

@@ -21,12 +21,17 @@ local default_config = {
 			path_style = "smart", -- How we detect path name for a ref
 			branch_style = "path", -- path will set the branch name to the same as the resolved path (relative to base)
 			--- Worktree behaviour
-			switch_if_wt_exists = true, -- Automatically switch if theres a working path
 			show_actions = true, -- Show actions by default
 		},
-		delete = {},
-		switch = {},
-		move = {},
+		remove = {
+			show_actions = true,
+		},
+		pick = {
+			show_actions = true,
+		},
+		move = {
+			show_actions = true,
+		},
 	},
 	git = {
 		binary = "git", -- path to the git binary

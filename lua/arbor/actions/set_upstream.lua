@@ -1,13 +1,13 @@
----@class arbor.action.push_upstream.opts
----@field workdir? arbor.action.push_upstream.workdir
+---@class arbor.action.set_upstream.opts
+---@field workdir? arbor.action.set_upstream.workdir
 ---@field quite? boolean
 
----@alias arbor.action.push_upstream.workdir
+---@alias arbor.action.set_upstream.workdir
 ---| "cwd"
 ---| "new_path"
 
 ---@param info? arbor.git.info
----@param opts? arbor.action.push_upstream.opts
+---@param opts? arbor.action.set_upstream.opts
 ---@return arbor.git.info | nil
 return function(info, opts)
 	opts = vim.tbl_extend("force", {
@@ -17,13 +17,13 @@ return function(info, opts)
 
 	if not info or not info.branch_info then
 		if not opts.quiet then
-			require("arbor._lib.notify").warn("Push upstream failed: branch info missing")
+			require("arbor._lib.notify").warn("Set upstream failed: branch info missing")
 		end
 		return
 	end
 	if opts.workdir == "new_path" and not info.new_path then
 		if not opts.quiet then
-			require("arbor._lib.notify").warn("Push upstream failed: new path not set")
+			require("arbor._lib.notify").warn("Set upstream failed: new path not set")
 		end
 		return
 	end
@@ -32,7 +32,7 @@ return function(info, opts)
 	end
 
 	local job = require("arbor.git").job({
-		args = { "push", "-u", info.branch_info.refname },
+		args = { "branch", "-u", info.branch_info.display_name },
 		cwd = opts.workdir == "new_path" and info.new_path or info.cwd,
 		enabled_recording = true,
 		on_exit = function(job, code)
@@ -41,5 +41,7 @@ return function(info, opts)
 			end
 		end,
 	})
+
+	---@diagnostic disable-next-line: undefined-field
 	job:sync()
 end

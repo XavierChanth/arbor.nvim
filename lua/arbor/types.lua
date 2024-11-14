@@ -24,15 +24,15 @@
 
 ---@class arbor.config.settings
 ---@field add? arbor.opts.add
----@field delete? arbor.opts.delete
----@field switch? arbor.opts.switch
+---@field remove? arbor.opts.remove
+---@field pick? arbor.opts.pick
 ---@field move? arbor.opts.move
 
 ---@class arbor.config.actions
 ---@field prefix? string
 ---@field add? table<string, arbor.action>
----@field delete? table<string, arbor.action>
----@field switch? table<string, arbor.action>
+---@field remove? table<string, arbor.action>
+---@field pick? table<string, arbor.action>
 ---@field move? table<string, arbor.action>
 
 ---@class arbor.config.git
@@ -72,6 +72,8 @@
 ---@field branch_input_opts? table gets passed to vim.ui.input for new branch
 ---@field select_opts? table gets passed to vim.ui.select for source branch
 ---@field preserve_default_hooks? boolean
+---@field show_actions? boolean
+---@field branch_pattern? string
 ---TODO: telescope, fzf configurable
 
 ---@class arbor.opts.select
@@ -83,20 +85,24 @@
 ---| function(item: arbor.item): string
 
 ---@class arbor.opts.add : arbor.opts
----@field branch_pattern? string
 ---@field branch_style? arbor.opts.add.branch_style
 ---@field path_style? arbor.opts.add.path_style
----@field show_actions? boolean
 ---@field show_remote_branches? boolean
----@field switch_hooks? arbor.hook_pair
----@field switch_if_wt_exists? boolean
+---@field on_existing? arbor.action | false
 
 ---@alias arbor.core.add
 ---| function(opts: arbor.opts.add|nil)
 
----@class arbor.opts.delete :arbor.opts
+---@alias arbor.core.pick
+---| function(opts: arbor.opts.pick|nil)
 
----@class arbor.opts.switch : arbor.opts
+---@alias arbor.core.remove
+---| function(opts: arbor.opts.remove|nil)
+
+---@class arbor.opts.remove :arbor.opts
+---@field force? boolean
+
+---@class arbor.opts.pick : arbor.opts
 
 ---@class arbor.opts.move : arbor.opts
 
@@ -114,14 +120,14 @@
 
 ---@alias arbor.feature
 ---| "add"
----| "delete"
----| "switch"
+---| "remove"
+---| "pick"
 ---| "move"
 
 ---@alias arbor.auprefix
 ---| "ArborAdd"
----| "ArborDelete"
----| "ArborSwitch"
+---| "ArborRemove"
+---| "ArborPick"
 ---| "ArborMove"
 
 ---@class arbor.item
@@ -185,10 +191,10 @@
 ---@class arbor.hooks
 ---@field pre_add? arbor.hooks.pre
 ---@field post_add? arbor.hooks.post
----@field pre_delete? arbor.hooks.pre
----@field post_delete? arbor.hooks.post
----@field pre_switch? arbor.hooks.pre
----@field post_switch? arbor.hooks.post
+---@field pre_remove? arbor.hooks.pre
+---@field post_remove? arbor.hooks.post
+---@field pre_pick? arbor.hooks.pre
+---@field post_pick? arbor.hooks.post
 ---@field pre_move? arbor.hooks.pre
 ---@field post_move? arbor.hooks.post
 
@@ -200,10 +206,10 @@
 ---@alias arbor.event
 ---| "ArborAddPre"
 ---| "ArborAddPost"
----| "ArborDeletePre"
----| "ArborDeletePost"
----| "ArborSwitchPre"
----| "ArborSwitchPost"
+---| "ArborRemovePre"
+---| "ArborRemovePost"
+---| "ArborPickPre"
+---| "ArborPickPost"
 ---| "ArborMovePre"
 ---| "ArborMovePost"
 
@@ -229,8 +235,8 @@
 
 ---@class arbor.config.settings.internal
 ---@field add arbor.opts.add.internal
----@field delete arbor.opts.delete
----@field switch arbor.opts.switch
+---@field remove arbor.opts.remove
+---@field pick arbor.opts.pick
 ---@field move arbor.opts.move
 
 ---@class arbor.opts.internal : arbor.opts
@@ -239,22 +245,13 @@
 
 ---@class arbor.opts.add.internal : arbor.opts.add
 ---@field show_remote_branches boolean
----@field branch_pattern? string | string[]
 ---@field branch_style arbor.opts.add.branch_style
 ---@field path_style arbor.opts.add.path_style
----@field switch_if_wt_exists boolean
----@field show_actions boolean
 
 ---@class arbor.opts.select.internal
 ---@field prompt string
 ---@field format_item? arbor.opts.select.format_item
 ---@field kind? string
-
----@class arbor.opts.delete.internal :arbor.opts
-
----@class arbor.opts.switch.internal : arbor.opts
-
----@class arbor.opts.move : arbor.opts
 
 ---@class arbor.config.actions.internal : arbor.config.actions
 ---@field prefix string

@@ -92,14 +92,14 @@ function M.get_branches(opts)
 		for _, branch in ipairs(main_branches) do
 			if branch == entry.display_name then
 				entry.main_branch = true
-				priority_branches[#priority_branches] = entry
+				priority_branches[#priority_branches + 1] = entry
 				return
 			end
 		end
 		if not entry.upstream or string.len(entry.upstream) == 0 then
-			local_branches[#local_branches + 1] = entry
-		else
 			remote_branches[#remote_branches + 1] = entry
+		else
+			local_branches[#local_branches + 1] = entry
 		end
 	end
 

@@ -51,6 +51,28 @@ function M.add(git_info, path, branch)
 	return code == 0
 end
 
-function M.switch(opts) end
+---@param git_info arbor.git.info
+---@param path string
+---@param force? boolean
+---@return boolean success
+function M.remove(git_info, path, force)
+	local args = { "worktree", "remove", path }
+	if force then
+		table.insert(args, 3, "-f")
+	end
+	local job = require("plenary.job"):new({
+		command = require("arbor.config").git.binary,
+		args = args,
+		cwd = git_info.common_dir,
+		enabled_recording = true,
+	})
+
+	local _, code = job:sync()
+	if code ~= 0 then
+		require("arbor._lib.notify").error(table.concat(job:stderr_result(), "\n"))
+	end
+
+	return code == 0
+end
 
 return M

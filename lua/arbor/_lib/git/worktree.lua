@@ -2,7 +2,7 @@
 local M = {}
 
 ---@param path? string
----@return nil
+---@return boolean
 function M.is_inside(path)
 	local res, code = require("plenary.job")
 		:new({

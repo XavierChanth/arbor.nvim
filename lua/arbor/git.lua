@@ -23,4 +23,10 @@ function M.info(cwd)
 	return require("arbor._lib.git.info").resolve(cwd)
 end
 
+---@param path string
+---@return boolean
+function M.is_inside_worktree(path)
+	return require("arbor._lib.git.worktree").is_inside(path)
+end
+
 return M

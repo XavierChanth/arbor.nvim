@@ -151,27 +151,31 @@ opts = {
 
 > See [ACTIONS](./ACTIONS.md) for more in-depth information.
 
-### Example 1 - Pickable actions
 
-This is how you would go about adding pickable actions to the core pickers.
-These can be your own custom functions too.
+### Example 1 - Setup your keymaps
+
 ```lua
-opts = {
-  actions = {
-    add = {
-      -- create a new branch + worktree from a selected base branch
-      ["add new branch"] = function(info)
-        -- This action is already available in arbor
-        require("arbor").actions.add_new_branch(info)
+---lazy.nvim example
+{
+  "xavierchanth/arbor.nvim",
+  keys = {
+    {
+      "<leader>ga",
+      function()
+        require("arbor").add()
       end,
+      desc = "Git Worktree Add",
     },
-    pick = {
-      -- Open a remove picker to delete a worktree
-      ["remove worktree"] = function()
-        require("arbor").remove()
+    {
+      "<leader>gw",
+      function()
+        require("arbor").pick()
       end,
-    }
-  }
+      desc = "Git Worktree",
+    },
+  },
+  ---@type arbor.config
+  opts = {}
 }
 ```
 
@@ -201,6 +205,30 @@ opts = {
 }
 ```
 
+### Example 3 - Pickable actions
+
+This is how you would go about adding pickable actions to the core pickers.
+These can be your own custom functions too.
+```lua
+opts = {
+  actions = {
+    add = {
+      -- create a new branch + worktree from a selected base branch
+      ["add new branch"] = function(info)
+        -- This action is already available in arbor
+        require("arbor").actions.add_new_branch(info)
+      end,
+    },
+    pick = {
+      -- Open a remove picker to delete a worktree
+      ["remove worktree"] = function()
+        require("arbor").remove()
+      end,
+    }
+  }
+}
+```
+
 ## What's missing?
 
 - I'm thinking about adding a picker for `git worktree move`, happy to do it if
@@ -208,6 +236,7 @@ it's asked for.
 - I also plan to expand the actions library to cover more common use-cases.
 - I would like to (carefully) expose some of the library code to make it easier
   to build custom actions. Right now there is `require("arbor").git` available.
+- There are no exec cmds yet, the only way to call the pickers is through lua.
 - Something else? Please raise an issue!
 - If you made a custom action because it wasn't available, please raise a PR or
   issue, so I can get it added to the plugin!

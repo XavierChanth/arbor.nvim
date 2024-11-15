@@ -60,7 +60,7 @@ end
 ---@diagnostic disable-next-line: unused-local
 function M.after_ref_selected(opts, git_info)
 	return function(item, idx)
-		if not item or not idx then
+		if not item then
 			return
 		end
 

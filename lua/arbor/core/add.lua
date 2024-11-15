@@ -62,7 +62,7 @@ function M.after_ref_selected(opts, git_info, local_branches)
 	return function(item, idx)
 		git_info.operation_opts = opts
 
-		if not item or not idx then
+		if not item then
 			return
 		end
 

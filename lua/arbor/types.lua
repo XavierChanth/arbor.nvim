@@ -6,6 +6,7 @@
 ---##Config
 ---> Implicitly type to supress warnings for the user
 ---@class arbor.config
+---@field apply_recommended? boolean
 ---@field select? arbor.select.provider
 ---@field input? arbor.input.provider
 ---@field notify? arbor.config.notify
@@ -15,6 +16,11 @@
 ---@field actions? arbor.config.actions
 ---@field hooks? arbor.hooks
 ---@field events? arbor.event[]
+---@field highlight? arbor.highlight
+
+---@class arbor.highlight
+---@field action? string
+---@field branch? string
 
 ---@class arbor.config.notify
 ---@field enabled? boolean
@@ -26,14 +32,11 @@
 ---@field add? arbor.opts.add
 ---@field remove? arbor.opts.remove
 ---@field pick? arbor.opts.pick
----@field move? arbor.opts.move
 
 ---@class arbor.config.actions
----@field prefix? string
 ---@field add? table<string, arbor.action>
 ---@field remove? table<string, arbor.action>
 ---@field pick? table<string, arbor.action>
----@field move? table<string, arbor.action>
 
 ---@class arbor.config.git
 ---@field binary? arbor.config.git.binary
@@ -53,9 +56,8 @@
 
 ---@alias arbor.select.provider
 ---| "vim"       Use vim.ui.select
---- These are coming soon:
---- "telescope" Use telescope.nvim
---- "fzf"       Use fzf-lua
+---| "telescope" Use telescope.nvim
+---| "fzf"       Use fzf-lua
 
 ---@alias arbor.input.provider
 ---| "vim" Use vim.ui.input
@@ -68,13 +70,10 @@
 
 ---@class arbor.opts
 ---@field hooks? arbor.hook_pair
----@field path_input_opts? table gets passed to vim.ui.input for path
----@field branch_input_opts? table gets passed to vim.ui.input for new branch
----@field select_opts? table gets passed to vim.ui.select for source branch
 ---@field preserve_default_hooks? boolean
+---@field select_opts? table opts table for vim.ui.select/telescope/fzf
 ---@field show_actions? boolean
 ---@field branch_pattern? string
----TODO: telescope, fzf configurable
 
 ---@class arbor.opts.select
 ---@field prompt? string
@@ -87,6 +86,8 @@
 ---@class arbor.opts.add : arbor.opts
 ---@field branch_style? arbor.opts.add.branch_style
 ---@field path_style? arbor.opts.add.path_style
+---@field path_input_opts? table gets passed to vim.ui.input for path
+---@field branch_input_opts? table gets passed to vim.ui.input for new branch
 ---@field on_existing? arbor.action | false
 ---@field show_remote_branches? boolean
 
@@ -105,14 +106,12 @@
 ---@class arbor.opts.pick : arbor.opts
 ---@field show_remote_branches? boolean
 
----@class arbor.opts.move : arbor.opts
-
 ---@alias arbor.opts.add.path_style
 ---| "prompt"       -- Prompt via vim.ui.input
 ---| "same"         -- Use the short ref name (e.g. origin/<branch>)
 ---| "basename"     -- Use the basename of the ref (if you have slashes in your branch name, it will only take the last part)
 ---| "smart"        -- Tries to guess the remote to strip and strip it
----| function(spec: arbor.hooks.post_spec, local_branches?: string[]): string
+---| function(git_info: arbor.git.info, local_branches?: string[]): string
 
 ---@alias arbor.opts.add.branch_style
 ---| "git"     -- Let git-worktree figure out the branch name (e.g. remotes/origin/<remote branch name>)
@@ -123,13 +122,11 @@
 ---| "add"
 ---| "remove"
 ---| "pick"
----| "move"
 
 ---@alias arbor.auprefix
 ---| "ArborAdd"
 ---| "ArborRemove"
 ---| "ArborPick"
----| "ArborMove"
 
 ---@class arbor.item
 ---@field id string
@@ -196,8 +193,6 @@
 ---@field post_remove? arbor.hooks.post
 ---@field pre_pick? arbor.hooks.pre
 ---@field post_pick? arbor.hooks.post
----@field pre_move? arbor.hooks.pre
----@field post_move? arbor.hooks.post
 
 ---@alias arbor.hooks.pre arbor.action
 ---@alias arbor.hooks.post arbor.action
@@ -211,8 +206,6 @@
 ---| "ArborRemovePost"
 ---| "ArborPickPre"
 ---| "ArborPickPost"
----| "ArborMovePre"
----| "ArborMovePost"
 
 ---## Internal Config
 ---> Strongly typed to suppress warnings internally
@@ -227,6 +220,11 @@
 ---@field actions arbor.config.actions
 ---@field hooks arbor.hooks
 ---@field events arbor.event[]
+---@field highlight arbor.highlight.internal
+
+---@class arbor.highlight.internal
+---@field action string
+---@field branch string
 
 ---@class arbor.config.notify.internal
 ---@field enabled boolean
@@ -238,7 +236,6 @@
 ---@field add arbor.opts.add.internal
 ---@field remove arbor.opts.remove
 ---@field pick arbor.opts.pick
----@field move arbor.opts.move
 
 ---@class arbor.opts.internal : arbor.opts
 ---@field hooks arbor.hook_pair
@@ -253,9 +250,6 @@
 ---@field prompt string
 ---@field format_item? arbor.opts.select.format_item
 ---@field kind? string
-
----@class arbor.config.actions.internal : arbor.config.actions
----@field prefix string
 
 ---@class arbor.config.git.internal
 ---@field binary string

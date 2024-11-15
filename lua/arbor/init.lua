@@ -19,41 +19,40 @@
 local M = {}
 
 local modules = {
-  -- core utilities
-  config = "arbor.config",
-  lib = "arbor._lib",
+	-- core utilities
+	config = "arbor.config",
+	lib = "arbor._lib",
 
-  -- core features
-  add = "arbor.core.add",
-  pick = "arbor.core.pick",
-  remove = "arbor.core.remove",
-  move = "arbor.core.move",
+	-- core features
+	add = "arbor.core.add",
+	pick = "arbor.core.pick",
+	remove = "arbor.core.remove",
 
-  -- extensions
-  actions = "arbor.actions",
-  events = "arbor.events",
-  git = "arbor.git",
+	-- extensions
+	actions = "arbor.actions",
+	events = "arbor.events",
+	git = "arbor.git",
 }
 
 setmetatable(M, {
-  __index = function(_, k)
-    if k == "lib" and not require("arbor.config").notify.lib then
-      require("arbor._lib.notify").warn(
-        "Anything in arbor.lib is subject to breaking changes across minor "
-        .. "updates. By using arbor.lib, you are subjecting yourself to "
-        .. "these breaking changes, and you understand that the devs will "
-        .. "not prioritize support for its usage.\n"
-        .. "To disable this message, set notify.lib = true in your config."
-      )
-    end
-    return require(modules[k])
-  end,
+	__index = function(_, k)
+		if k == "lib" and not require("arbor.config").notify.lib then
+			require("arbor._lib.notify").warn(
+				"Anything in arbor.lib is subject to breaking changes across minor "
+					.. "updates. By using arbor.lib, you are subjecting yourself to "
+					.. "these breaking changes, and you understand that the devs will "
+					.. "not prioritize support for its usage.\n"
+					.. "To disable this message, set notify.lib = true in your config."
+			)
+		end
+		return require(modules[k])
+	end,
 })
 
 ---@param opts arbor.config
 ---@return nil
 function M.setup(opts)
-  require("arbor.config").set(opts)
+	require("arbor.config").set(opts)
 end
 
 return M

@@ -10,8 +10,8 @@ take a look at
 [polarmutex's fork of it](https://github.com/polarmutex/git-worktree.nvim).
 Both are amazing plugins, and they work great. The reason I made this plugin, is
 that git-worktree didn't play very nicely with my workflow, and it resulted in
-a very large wrapper around the plugin, to mostly get what I wanted. I built
-arbor to address my problems with it.
+a very large wrapper around the plugin to get what I wanted. I built arbor to 
+address my problems with it.
 
 ### Arbor by design
 

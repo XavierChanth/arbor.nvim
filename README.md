@@ -39,7 +39,7 @@ good autocomplete. The only exception is the select_opts table
 
 ### lazy.nvim
 
-```
+```lua
 {
   "xavierchanth/arbor.nvim",
   ---@type arbor.config
@@ -237,6 +237,7 @@ it's asked for.
 - I would like to (carefully) expose some of the library code to make it easier
   to build custom actions. Right now there is `require("arbor").git` available.
 - There are no exec cmds yet, the only way to call the pickers is through lua.
+- Telescope extension
 - Something else? Please raise an issue!
 - If you made a custom action because it wasn't available, please raise a PR or
   issue, so I can get it added to the plugin!

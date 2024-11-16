@@ -16,18 +16,17 @@ function M.is_inside(path)
 	return code == 0 and res[1] == "true"
 end
 
----@param git_info arbor.git.info
+---@param cwd string
 ---@param path string
+---@param ref string
 ---@param branch string?
 ---@return boolean success
-function M.add(git_info, path, branch)
+function M.add(cwd, path, ref, branch)
 	local args = {
 		"worktree",
 		"add",
 		path,
-		-- so I did some testing, and the fully qualified refname will trigger ambiguity checks
-		-- but, the display_name will automatically be inferred if possible, so it's less likely to fail
-		git_info.branch_info.display_name,
+		ref,
 	}
 
 	-- git will automatically try to guess the branch based on path so it's optional
@@ -39,7 +38,7 @@ function M.add(git_info, path, branch)
 	local job = require("plenary.job"):new({
 		command = require("arbor.config").git.binary,
 		args = args,
-		cwd = git_info.common_dir,
+		cwd = cwd,
 		enabled_recording = true,
 	})
 

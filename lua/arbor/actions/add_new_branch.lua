@@ -24,10 +24,17 @@ return function(_, opts)
 		opts.show_actions = false
 	end
 	opts.hooks = opts.hooks or {}
+
+	-- Cache the hook in the closure to prevent infinite recursion
+	local pre_hook
+	if opts.hooks.pre then
+		pre_hook = opts.hooks.pre
+	end
+
 	opts.hooks.pre = function(info)
 		create_branch_hook(info)
-		if opts.hooks.pre then
-			info = opts.hooks.pre(info) or info
+		if pre_hook then
+			info = pre_hook(info) or info
 		end
 		return info
 	end

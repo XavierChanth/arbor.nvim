@@ -112,6 +112,23 @@ end
 
 ---@param cwd? string
 ---@return string[] | nil
+function M.get_local_branches(cwd)
+	local job = require("plenary.job"):new({
+		command = require("arbor.config").git.binary,
+		args = { "branch", "--format", "%(refname:lstrip=2)" },
+		cwd = cwd or require("arbor._lib.path").cwd(),
+		enabled_recording = true,
+	})
+
+	local res, code = job:sync()
+	if code ~= 0 then
+		return
+	end
+	return res
+end
+
+---@param cwd? string
+---@return string[] | nil
 function M.list_remotes(cwd)
 	local job = require("plenary.job"):new({
 		command = require("arbor.config").git.binary,

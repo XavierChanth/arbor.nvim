@@ -58,6 +58,10 @@ local function telescope(items, opts, cb)
 		:find()
 end
 
+local function fzf_line(type, label)
+	return string.format("%s : %s", type, label)
+end
+
 ---@param items arbor.item[]
 ---@param opts table
 ---@param cb function(item: core.item|nil, idx: integer|nil)
@@ -71,8 +75,11 @@ local function fzf(items, opts, cb)
 			type_hl = hl.action
 		end
 		local type = require("fzf-lua.utils").ansi_from_hl(type_hl, item.type)
-		lines[#lines + 1] = string.format("%s : %s", type, item.label)
-		entries[lines[#lines]] = item
+		local line_hl = fzf_line(type, item.label)
+		lines[#lines + 1] = line_hl
+
+		local line_nohl = fzf_line(item.type, item.label)
+		entries[line_nohl] = item
 	end
 	if opts.prompt then
 		opts.prompt = opts.prompt .. " "
@@ -81,7 +88,7 @@ local function fzf(items, opts, cb)
 		prompt = "Worktrees",
 		actions = {
 			enter = function(selected)
-				cb(entries[selected])
+				cb(entries[selected[1]])
 			end,
 		},
 	}, opts or {})

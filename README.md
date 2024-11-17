@@ -190,7 +190,7 @@ completion for the opts table if you have lua_ls setup.
 
 In addition, you can explore [config.lua](./lua/arbor/config.lua),
 [actions.lua](./lua/arbor/actions.lua), and the various actions in
-[actions/](./lua/arbor/actions/]. Actions are also covered in the next section,
+[actions/](./lua/arbor/actions/). Actions are also covered in the next section,
 [Customization](#Customization).
 
 > If you are adventurous, there is also [types.lua](./lua/arbor/types.lua) which
@@ -300,7 +300,7 @@ added alongside branches in your pickers. They are also compliant as hooks
 or autocmd callbacks. The actions library
 [actions.lua](./lua/arbor/actions.lua), contains all of the actions predefined
 by arbor. You can find the individual code in
-[actions/](./lua/arbor/actions/] and require, copy or reference it to build
+[actions/](./lua/arbor/actions/) and require, copy or reference it to build
 your own workflows.
 
 > See [ACTIONS](./ACTIONS.md) for more in-depth information.

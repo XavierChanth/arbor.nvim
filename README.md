@@ -2,6 +2,15 @@
 
 > Just like a true arborist, manage your worktrees in neovim.
 
+## Contents
+
+[Overview](#Overview)
+[Setup](#Setup)
+[Usage](#Usage)
+[Configuration](#Configuration)
+[Customization](#Customization)
+[What's Missing?](#What's-Missing?)
+
 ## Overview
 
 Honestly, it's probably not for most people. If you want a git worktree plugin,

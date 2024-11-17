@@ -4,12 +4,12 @@
 
 ## Contents
 
-[Overview](#Overview)
-[Setup](#Setup)
-[Usage](#Usage)
-[Configuration](#Configuration)
-[Customization](#Customization)
-[What's Missing?](#Whats-Missing)
+[Overview](#Overview)  
+[Setup](#Setup)  
+[Usage](#Usage)  
+[Configuration](#Configuration)  
+[Customization](#Customization)  
+[What's Missing?](#Whats-Missing)  
 
 ## Overview
 

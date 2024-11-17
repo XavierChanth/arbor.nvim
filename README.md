@@ -49,6 +49,128 @@ good autocomplete. The only exception is the select_opts table
 }
 ```
 
+## Usage
+
+There are two ways to use arbor, with the `Arbor` exec command, or through the
+lua API:
+
+### Exec command
+
+```sh
+:Arbor pick
+:Arbor add
+:Arbor remove
+```
+
+Running just `:Arbor` is the same as `:Arbor pick`.
+
+> At the moment the exec commands don't support passing arguments, this may be
+> added at a later date upon request, please open an issue if you want this!
+
+### Lua API
+
+With the lua API, you gain the ability to override the default values of a
+command, you can have have multiple `add`, `pick` or `remove` keymaps configured
+in this way.
+
+#### Pick
+
+By default, there are some preset actions enabled in the options which make
+nvim cd to the worktree. See [ACTIONS](./ACTIONS.md#Wrapping-Functions) for an example:
+
+```lua
+vim.keymap.set("n", "<leader>gw", function()
+  require("arbor").pick()
+end, {desc = "Pick worktree"})
+```
+
+<details>
+<summary>Pick Options</summary>
+
+```lua
+require("arbor").pick({
+  hooks = {
+    pre = function(info) end, -- Add a pre-hook
+    post = function(info) end, -- Add a post-hook
+  },
+  preserve_default_hooks = true, -- Whether to also run the hooks in your config
+  select_opts = nil, -- Passed to vim.ui.select/telescope/fzf for initial selection
+  show_actions = true, -- show actions (the ones as selectable items)
+  show_remote_branches = false, -- Include remote branches
+})
+```
+
+</details>
+
+#### Add
+
+By default, the preset hook for add will track the upstream branch when adding
+from a remote branch, or push an upstream branch when adding from a local branch.
+
+```lua
+vim.keymap.set("n", "<leader>ga", function()
+  require("arbor").add()
+end, {desc = "Add worktree"})
+```
+
+
+<details>
+<summary>Add Options</summary>
+
+```lua
+require("arbor").add({
+  hooks = {
+    pre = function(info) end, -- Add a pre-hook
+    post = function(info) end, -- Add a post-hook
+  },
+  preserve_default_hooks = true, -- Whether to also run the hooks in your config
+  on_existing = function(info) end, -- Special hook to handle when the selected branch already exists
+  path_input_opts = nil, -- Passed to vim.ui.input when prompted for worktree path
+  branch_input_opts = nil, -- Passed to vim.ui.input when prompted for new branch name
+  select_opts = nil, -- Passed to vim.ui.select/telescope/fzf for initial selection
+  path_style = "smart", -- How we detect path name for a git ref
+  -- Other options: "same", "basename", "prompt", function(git_info: arbor.git.info, local_branches?: string[]): string
+  branch_style = "path", -- path will set the branch name to the same as the resolved path (relative to base)
+  -- Other options: "git", "prompt"
+  show_remote_branches = true, -- Include remote branches
+  branch_pattern = nil, -- Filter branches with pattern (see man git-for-each-ref)
+  show_actions = true, -- Show actions by default
+})
+```
+
+</details>
+
+#### Remove
+
+By default, the preset hook for add will track the upstream branch when adding
+from a remote branch, or push an upstream branch when adding from a local branch.
+
+```lua
+vim.keymap.set("n", "<leader>gr", function()
+  require("arbor").remove()
+end, {desc = "Remove worktree"})
+```
+
+
+<details>
+<summary>Remove Options</summary>
+
+```lua
+require("arbor").remove({
+  hooks = {
+    pre = function(info) end, -- Add a pre-hook
+    post = function(info) end, -- Add a post-hook
+  },
+  preserve_default_hooks = true, -- Whether to also run the hooks in your config
+  select_opts = nil, -- Passed to vim.ui.select/telescope/fzf for initial selection
+  branch_pattern = nil, -- Filter branches with pattern (see man git-for-each-ref)
+  show_actions = true, -- show actions as selectable items
+  force = false, -- pass force to git worktree remove
+})
+```
+
+</details>
+
 ## Configuration
 
 <details>
@@ -236,7 +358,6 @@ it's asked for.
 - I also plan to expand the actions library to cover more common use-cases.
 - I would like to (carefully) expose some of the library code to make it easier
   to build custom actions. Right now there is `require("arbor").git` available.
-- There are no exec cmds yet, the only way to call the pickers is through lua.
 - Telescope extension
 - Something else? Please raise an issue!
 - If you made a custom action because it wasn't available, please raise a PR or

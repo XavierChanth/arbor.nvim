@@ -92,7 +92,7 @@ function M.arbor_post_switch(info)
     else
       require("arbor").actions.cd_existing_worktree(info)
     end
-    M.arbor_set_dashboard(info) -- Set the dashboard with worktree name
+    M.arbor_set_dashboard(info) -- Set the dashboard with worktree name (function omitted for brevity)
     vim.cmd("bufdo bd")
   else
     vim.notify("Already on this worktree")

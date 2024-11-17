@@ -49,6 +49,19 @@ setmetatable(M, {
 	end,
 })
 
+-- TODO: support passing args here?
+function M.run(cmd)
+	cmd = cmd or "pick"
+	local valid = { "pick", "add", "remove" }
+	if vim.tbl_contains(valid, cmd) then
+		require(modules[cmd])[cmd]()
+	else
+		require("arbor._lib.notify").warn(
+			string.format("%s is not a valid command. must be on of %s", cmd, vim.inspect(valid))
+		)
+	end
+end
+
 ---@param opts arbor.config
 ---@return nil
 function M.setup(opts)

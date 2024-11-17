@@ -191,17 +191,18 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 		local ref = git_info.branch_info.display_name
 
 		-- Special case: branch already exists locally
-		if git_info.new_branch then
+		local new_branch = git_info.new_branch
+		if new_branch then
 			local branches = require("arbor._lib.git").query.get_local_branches(git_info.common_dir)
 			for _, b in ipairs(branches or {}) do
-				if b == git_info.new_branch then
-					ref = git_info.new_branch --[[@as string]]
-					git_info.new_branch = nil
+				if b == new_branch then
+					ref = new_branch --[[@as string]]
+					new_branch = nil
 				end
 			end
 		end
 
-		if not lib.git.worktree.add(git_info.common_dir, git_info.new_path, ref, git_info.new_branch) then
+		if not lib.git.worktree.add(git_info.common_dir, git_info.new_path, ref, new_branch) then
 			return
 		end
 

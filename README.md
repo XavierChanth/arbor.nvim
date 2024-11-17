@@ -9,7 +9,7 @@
 [Usage](#Usage)
 [Configuration](#Configuration)
 [Customization](#Customization)
-[What's Missing?](#What's-Missing?)
+[What's Missing?](#Whats-Missing)
 
 ## Overview
 

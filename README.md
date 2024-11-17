@@ -151,8 +151,10 @@ require("arbor").add({
 
 #### Remove
 
-By default, the preset hook for add will track the upstream branch when adding
-from a remote branch, or push an upstream branch when adding from a local branch.
+No preset hooks from remove, it just deletes the worktree. The branch is still
+available locally. You could add a hook to remove the branch too, but make sure
+you check that changes have been committed and pushed, otherwise you risk
+losing work.
 
 ```lua
 vim.keymap.set("n", "<leader>gr", function()

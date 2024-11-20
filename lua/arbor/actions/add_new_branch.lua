@@ -18,7 +18,9 @@ end
 ---@return arbor.git.info | nil
 return function(_, opts)
 	opts = opts or {}
-	opts.path_style = "prompt"
+	if type(opts.path_style) ~= "function" then
+		opts.path_style = "prompt"
+	end
 	opts.on_existing = opts.on_existing or false
 	if opts.show_actions == nil then
 		opts.show_actions = false

@@ -138,9 +138,9 @@ require("arbor").add({
   branch_input_opts = nil, -- Passed to vim.ui.input when prompted for new branch name
   select_opts = nil, -- Passed to vim.ui.select/telescope/fzf for initial selection
   path_style = "smart", -- How we detect path name for a git ref
-  -- Other options: "same", "basename", "prompt", function(git_info: arbor.git.info, local_branches?: string[]): string
+  -- Other options: "same", "basename", "prompt", "path", function(git_info: arbor.git.info, local_branches?: string[]): string
   branch_style = "path", -- path will set the branch name to the same as the resolved path (relative to base)
-  -- Other options: "git", "prompt"
+  -- Other options: "prompt", function(git_info: arbor.git.info, local_branches?: arbor.git.branch[]): string
   show_remote_branches = true, -- Include remote branches
   branch_pattern = nil, -- Filter branches with pattern (see man git-for-each-ref)
   show_actions = true, -- Show actions by default
@@ -229,9 +229,9 @@ opts = {
 
 			--- Naming resolution
 			path_style = "smart", -- How we detect path name for a git ref
-			-- Other options: "same", "basename", "prompt", function(git_info: arbor.git.info, local_branches?: string[]): string
+			-- Other options: "same", "basename", "prompt", "path", function(git_info: arbor.git.info, local_branches?: string[]): string
 			branch_style = "path", -- path will set the branch name to the same as the resolved path (relative to base)
-			-- Other options: "git", "prompt"
+			-- Other options: "prompt", function(git_info: arbor.git.info, local_branches?: arbor.git.branch[]): string
 
 			--- Git options
 			show_remote_branches = true, -- Include remote branches

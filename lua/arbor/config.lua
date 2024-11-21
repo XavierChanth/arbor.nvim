@@ -93,7 +93,7 @@ local default_config = {
 local M = {}
 
 ---@type arbor.config.internal
-local config = vim.tbl_extend("force", default_config, {})
+M.config = vim.tbl_extend("force", default_config, {})
 
 ---@param opts? arbor.config
 ---@return arbor.config.internal
@@ -103,18 +103,18 @@ function M.set(opts)
 	if opts.apply_recommended then
 		recommended = require("arbor.recommended_hooks")
 	end
-	config = vim.tbl_deep_extend("force", config, recommended, opts)
-	return config
+	M.config = vim.tbl_deep_extend("force", M.config, recommended, opts)
+	return M.config
 end
 
 setmetatable(M, {
 	__index = function(_, k)
 		--- resolve the git binary as a string
-		if k == "git" and config.git and type(config.git.binary) == "function" then
-			config.git.binary = config.git.binary()
+		if k == "git" and M.config.git and type(M.config.git.binary) == "function" then
+			M.config.git.binary = M.config.git.binary()
 		end
 
-		return config[k]
+		return M.config[k]
 	end,
 })
 

@@ -17,15 +17,25 @@ end
 ---@param opts? arbor.opts.add
 ---@return arbor.git.info | nil
 return function(_, opts)
-	opts = opts or {}
-	if type(opts.path_style) ~= "function" then
-		opts.path_style = "prompt"
+	opts = vim.tbl_deep_extend("force", require("arbor.config").config.settings.add, {
+		on_existing = false,
+		show_actions = false,
+		hooks = {},
+		branch_style = "prompt",
+		path_style = "branch",
+	}, opts or {})
+
+	if
+		not opts.branch_style == "prompt"
+		and not opts.path_style == "prompt"
+		and not type(opts.branch_style) == "function"
+		and not type(opts.path_style) == "function"
+	then
+		require("arbor._lib.notify").error(
+			'One of branch_style or path_style must be set to "prompt" or a function to use the add_new_branch action'
+		)
+		return
 	end
-	opts.on_existing = opts.on_existing or false
-	if opts.show_actions == nil then
-		opts.show_actions = false
-	end
-	opts.hooks = opts.hooks or {}
 
 	-- Cache the hook in the closure to prevent infinite recursion
 	local pre_hook

@@ -138,21 +138,12 @@ function M.after_path_selected(opts, git_info, local_branches, is_sync)
 			return
 		end
 
-		if not git_info.new_path then
-			lib.notify.error("Failed to resolve worktree path")
-			return
-		end
-
 		if opts.branch_style == "path" then
+			if opts.path_style == "branch" then
+				lib.notify.error('branch_style="path" and path_style="branch" are mutually exclusive')
+				return
+			end
 			git_info.new_branch = git_info.new_path
-		end
-
-		-- Final path for worktree
-		git_info.new_path = lib.path.norm(git_info.resolved_base .. "/" .. git_info.new_path)
-
-		if not git_info.new_path then
-			lib.notify.error("Failed to resolve worktree path")
-			return
 		end
 
 		if opts.branch_style == "prompt" then
@@ -182,15 +173,31 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 			return
 		end
 
+		if opts.path_style == "branch" then
+			git_info.new_path = git_info.new_branch
+		end
+
+		if not git_info.new_path then
+			lib.notify.error("Failed to resolve worktree path")
+			return
+		end
+
+		-- Final path for worktree
+		git_info.new_path = lib.path.norm(git_info.resolved_base .. "/" .. git_info.new_path)
+
+		if not git_info.new_path then
+			lib.notify.error("Failed to normalize worktree path")
+			return
+		end
+
 		local events = common.get_events("add", "ArborAdd", opts)
 		git_info = events.hookpre(git_info) or git_info
 		if events.aupre then
 			events.aupre(git_info)
 		end
 
+		-- Special case: branch already exists locally (i.e. don't use ref, use branch name)
 		local ref = git_info.branch_info.display_name
-
-		-- Special case: branch already exists locally
 		local new_branch = git_info.new_branch
 		if new_branch then
 			local branches = require("arbor._lib.git").query.get_local_branches(git_info.common_dir)

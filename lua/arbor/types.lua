@@ -111,12 +111,13 @@
 ---| "same"         -- Use the short ref name (e.g. origin/<branch>)
 ---| "basename"     -- Use the basename of the ref (if you have slashes in your branch name, it will only take the last part)
 ---| "smart"        -- Tries to guess the remote to strip and strip it
+---| "path"         -- Uses the path resolution for the branch name
 ---| function(git_info: arbor.git.info, local_branches?: arbor.git.branch[]): string
 
 ---@alias arbor.opts.add.branch_style
----| "git"     -- Let git-worktree figure out the branch name (e.g. remotes/origin/<remote branch name>)
 ---| "path"    -- Use resolved path as the branch name
 ---| "prompt"  -- Input branch name
+---| function(git_info: arbor.git.info, local_branches?: arbor.git.branch[]): string
 
 ---@alias arbor.feature
 ---| "add"

@@ -88,6 +88,7 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			return
 		end
 
+		-- Only the options which can be safely resolved early are listed here
 		if opts.path_style == "basename" then
 			git_info.new_path = vim.fs.basename(git_info.branch_info.display_name)
 		elseif opts.path_style == "smart" then
@@ -108,8 +109,6 @@ function M.after_ref_selected(opts, git_info, local_branches)
 
 		if opts.path_style == "same" then
 			git_info.new_path = git_info.branch_info.display_name
-		elseif type(opts.path_style) == "function" then
-			git_info.new_path = opts.path_style(git_info, local_branches)
 		end
 
 		if opts.path_style == "prompt" then
@@ -138,14 +137,6 @@ function M.after_path_selected(opts, git_info, local_branches, is_sync)
 			return
 		end
 
-		if opts.branch_style == "path" then
-			if opts.path_style == "branch" then
-				lib.notify.error('branch_style="path" and path_style="branch" are mutually exclusive')
-				return
-			end
-			git_info.new_branch = git_info.new_path
-		end
-
 		if opts.branch_style == "prompt" then
 			local input_opts = opts.branch_input_opts or {
 				prompt = "Name for the branch: ",
@@ -171,6 +162,23 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 		elseif not is_sync then
 			-- user canceled the input
 			return
+		end
+
+		-- Options which must be resolved late are done so here
+		if type(opts.branch_style) == "function" then
+			git_info.new_path = opts.branch_style(git_info, local_branches)
+		end
+
+		if type(opts.path_style) == "function" then
+			git_info.new_path = opts.path_style(git_info, local_branches)
+		end
+
+		if opts.branch_style == "path" then
+			if opts.path_style == "branch" then
+				lib.notify.error('branch_style="path" and path_style="branch" are mutually exclusive')
+				return
+			end
+			git_info.new_branch = git_info.new_path
 		end
 
 		if opts.path_style == "branch" then

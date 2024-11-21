@@ -114,7 +114,7 @@ function M.after_ref_selected(opts, git_info, local_branches)
 
 		if opts.path_style == "prompt" then
 			local input_opts = opts.path_input_opts or {
-				prompt = "Path for the worktree",
+				prompt = "Path for the worktree: ",
 			}
 			lib.input(input_opts, M.after_path_selected(opts, git_info, local_branches))
 			return
@@ -157,7 +157,7 @@ function M.after_path_selected(opts, git_info, local_branches, is_sync)
 
 		if opts.branch_style == "prompt" then
 			local input_opts = opts.branch_input_opts or {
-				prompt = "Name for the branch",
+				prompt = "Name for the branch: ",
 			}
 			lib.input(input_opts, M.after_branch_selected(opts, git_info, local_branches))
 			return

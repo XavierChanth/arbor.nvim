@@ -207,6 +207,10 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 					new_branch = nil
 				end
 			end
+		-- Removed git from the types, but keeping it in the code to prevent breaking changes
+		elseif opts.branch_style ~= "git" then
+			lib.notify.error("Failed to resolve the branch")
+			return
 		end
 
 		if not lib.git.worktree.add(git_info.common_dir, git_info.new_path, ref, new_branch) then

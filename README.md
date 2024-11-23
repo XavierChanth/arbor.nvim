@@ -134,6 +134,7 @@ require("arbor").add({
   },
   preserve_default_hooks = true, -- Whether to also run the hooks in your config
   on_existing = function(info) end, -- Special hook to handle when the selected branch already exists
+  on_add_failed = function(info, branch) end, -- Special hook to handle when git worktree add fails
   path_input_opts = nil, -- Table of input opts for path (currently takes a string for "prompt")
   branch_input_opts = nil, -- Table of input opts for branch (currently takes a string for "prompt")
   select_opts = nil, -- Passed to vim.ui.select/telescope/fzf for initial selection

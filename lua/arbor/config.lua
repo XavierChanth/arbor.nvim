@@ -22,8 +22,8 @@ local default_config = {
 	settings = {
 		add = {
 			--- Input options
-			path_input_opts = nil, -- Passed to vim.ui.input when prompted for worktree path
-			branch_input_opts = nil, -- Passed to vim.ui.input when prompted for new branch name
+			path_input_opts = nil, -- Table of input opts for path { prompt = <string> }
+			branch_input_opts = nil, -- Table of input opts for only { prompt = <string> }
 			select_opts = nil, -- Passed to vim.ui.select/telescope/fzf for initial selection
 
 			--- Naming resolution

@@ -89,7 +89,11 @@
 ---@field path_input_opts? table gets passed to vim.ui.input for path
 ---@field branch_input_opts? table gets passed to vim.ui.input for new branch
 ---@field on_existing? arbor.action | false
+---@field on_add_failed? arbor.core.add.on_add_failed
 ---@field show_remote_branches? boolean
+
+---@alias arbor.core.add.on_add_failed
+---| function(info: arbor.git.info, branch: string)
 
 ---@alias arbor.core.add
 ---| function(opts: arbor.opts.add|nil)

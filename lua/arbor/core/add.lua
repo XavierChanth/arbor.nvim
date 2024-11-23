@@ -88,7 +88,7 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			return
 		end
 
-		-- Only the options which can be safely resolved early are listed here
+		-- Early resolution (determine branch or path from existing info)
 		if opts.path_style == "basename" then
 			git_info.new_path = vim.fs.basename(git_info.branch_info.display_name)
 		elseif opts.path_style == "smart" then
@@ -111,60 +111,25 @@ function M.after_ref_selected(opts, git_info, local_branches)
 			git_info.new_path = git_info.branch_info.display_name
 		end
 
+		-- Prompt resolution
 		if opts.path_style == "prompt" then
-			local input_opts = opts.path_input_opts or {
-				prompt = "Path for the worktree: ",
-			}
-			lib.input(input_opts, M.after_path_selected(opts, git_info, local_branches))
-			return
-		end
-
-		M.after_path_selected(opts, git_info, local_branches, true)()
-	end
-end
-
----@param opts arbor.opts.add
----@param git_info arbor.git.info
----@param local_branches? arbor.git.branch[]
----@param is_sync? boolean
----@diagnostic disable-next-line: unused-local
-function M.after_path_selected(opts, git_info, local_branches, is_sync)
-	return function(path)
-		if path then
-			git_info.new_path = path
-		elseif not is_sync then
-			-- user canceled the input
-			return
+			local path = vim.fn.input(opts.path_input_opts and opts.path_input_opts.prompt or "Worktree path: ")
+			if string.len(path) == 0 then
+				return
+			end
+			git_info.new_branch = path
 		end
 
 		if opts.branch_style == "prompt" then
-			local input_opts = opts.branch_input_opts or {
-				prompt = "Name for the branch: ",
-			}
-			lib.input(input_opts, M.after_branch_selected(opts, git_info, local_branches))
-			return
-		end
-
-		M.after_branch_selected(opts, git_info, local_branches, true)(nil)
-	end
-end
-
----@param opts arbor.opts.add
----@param git_info arbor.git.info
----@param local_branches? arbor.git.branch[]
----@param is_sync? boolean
----@diagnostic disable-next-line: unused-local
-function M.after_branch_selected(opts, git_info, local_branches, is_sync)
-	---@param branch string|nil
-	return function(branch)
-		if branch then
+			local branch =
+				vim.fn.input(opts.branch_input_opts and opts.branch_input_opts.prompt or "Name for the branch: ")
+			if string.len(branch) == 0 then
+				return
+			end
 			git_info.new_branch = branch
-		elseif not is_sync then
-			-- user canceled the input
-			return
 		end
 
-		-- Options which must be resolved late are done so here
+		-- Function resolution
 		if type(opts.branch_style) == "function" then
 			git_info.new_path = opts.branch_style(git_info, local_branches)
 		end
@@ -173,6 +138,7 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 			git_info.new_path = opts.path_style(git_info, local_branches)
 		end
 
+		-- Dependency resolution (branch depends on path or vice-versa)
 		if opts.branch_style == "path" then
 			if opts.path_style == "branch" then
 				lib.notify.error('branch_style="path" and path_style="branch" are mutually exclusive')
@@ -198,6 +164,7 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 			return
 		end
 
+		-- Pre hooks
 		local events = common.get_events("add", "ArborAdd", opts)
 		git_info = events.hookpre(git_info) or git_info
 		if events.aupre then
@@ -222,9 +189,13 @@ function M.after_branch_selected(opts, git_info, local_branches, is_sync)
 		end
 
 		if not lib.git.worktree.add(git_info.common_dir, git_info.new_path, ref, new_branch) then
+			if opts.on_add_failed then
+				opts.on_add_failed(git_info, new_branch or ref)
+			end
 			return
 		end
 
+		-- Post hooks
 		git_info = events.hookpost(git_info) or git_info
 		if events.aupost then
 			events.aupost(git_info)

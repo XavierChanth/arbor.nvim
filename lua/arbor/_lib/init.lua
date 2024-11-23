@@ -1,6 +1,5 @@
 ---@class arbor.lib
 ---@field git arbor.lib.git
----@field input arbor.input
 ---@field notify arbor.notify
 ---@field path arbor.path
 ---@field select arbor.select

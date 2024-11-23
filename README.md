@@ -134,8 +134,8 @@ require("arbor").add({
   },
   preserve_default_hooks = true, -- Whether to also run the hooks in your config
   on_existing = function(info) end, -- Special hook to handle when the selected branch already exists
-  path_input_opts = nil, -- Passed to vim.ui.input when prompted for worktree path
-  branch_input_opts = nil, -- Passed to vim.ui.input when prompted for new branch name
+  path_input_opts = nil, -- Table of input opts for path (currently takes a string for "prompt")
+  branch_input_opts = nil, -- Table of input opts for branch (currently takes a string for "prompt")
   select_opts = nil, -- Passed to vim.ui.select/telescope/fzf for initial selection
   path_style = "smart", -- How we detect path name for a git ref
   -- Other options: "same", "basename", "prompt", "path", function(git_info: arbor.git.info, local_branches?: string[]): string

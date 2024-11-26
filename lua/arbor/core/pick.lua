@@ -32,21 +32,15 @@ function M.pick(opts)
 	local branches = {}
 
 	for _, branch in ipairs(priority_branches or {}) do
-		if branch.worktree_path and string.len(branch.worktree_path) > 0 then
-			branches[#branches + 1] = branch
-		end
+		branches[#branches + 1] = branch
 	end
 
 	for _, branch in ipairs(local_branches or {}) do
-		if branch.worktree_path and string.len(branch.worktree_path) > 0 then
-			branches[#branches + 1] = branch
-		end
+		branches[#branches + 1] = branch
 	end
 
 	for _, branch in ipairs(remote_branches or {}) do
-		if branch.worktree_path and string.len(branch.worktree_path) > 0 then
-			branches[#branches + 1] = branch
-		end
+		branches[#branches + 1] = branch
 	end
 
 	items = common.add_branches_to_items(branches, items)

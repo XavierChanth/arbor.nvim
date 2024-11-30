@@ -2,6 +2,13 @@
 
 > Just like a true arborist, manage your worktrees in neovim.
 
+## Development Status
+
+I switched to using [jj](https://github.com/martinvonz/jj). It offers a workflow which I
+prefer. In my case, there are almost no disadvantages to using it over git worktrees,
+but there are plenty of improvements. I won't be actively developing arbor
+anymore, but I will review and accept PRs.
+
 ## Contents
 
 [Overview](#Overview)  
